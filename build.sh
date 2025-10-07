@@ -1,5 +1,5 @@
 #!/bin/bash
-cd ~/android_kernel_xiaomi_sdm845
+cd android_kernel_xiaomi_sdm845
 
 echo "=== 步骤1: 清理 ==="
 make clean
