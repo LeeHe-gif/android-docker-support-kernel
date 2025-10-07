@@ -11,6 +11,17 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
+    - name: Free disk space
+      uses: jlumbroso/free-disk-space@main
+      with:
+        tool-cache: true
+        android: true
+        dotnet: true
+
+    - name: space usage check  
+      run: |
+        df -H
+
     - name: Install basic dependencies
       run: |
         sudo apt-get update
@@ -92,7 +103,7 @@ jobs:
     - name: Create out directory archive
       run: |
         cd android_kernel_xiaomi_sdm845
-        zip -r kernel_out_directory.zip out/
+        zip -r kernel_boot_directory.zip out/arch/arm64/boot
         
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
@@ -100,7 +111,7 @@ jobs:
         name: kernel-build-artifacts
         path: |
           anykernel3/polaris_dockerkernel.zip
-          android_kernel_xiaomi_sdm845/kernel_out_directory.zip
+          android_kernel_xiaomi_sdm845/kernel_boot_directory.zip
         retention-days: 30
 
     - name: Create Release
@@ -121,7 +132,7 @@ jobs:
           
           ## 包含文件：
           - `polaris_dockerkernel.zip` - AnyKernel3 刷机包
-          - `kernel_out_directory.zip` - 完整的编译输出目录
+          - `kernel_boot_directory.zip` - 完整的编译输出目录
           
           ## 特性：
           - ✅ 完整 Docker 容器支持
@@ -140,6 +151,6 @@ jobs:
         prerelease: false
         files: |
           anykernel3/polaris_dockerkernel.zip
-          android_kernel_xiaomi_sdm845/kernel_out_directory.zip
+          android_kernel_xiaomi_sdm845/kernel_boot_directory.zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
