@@ -42,15 +42,15 @@ jobs:
         
     - name: Build kernel
       run: |
-        cp build.sh /home/runner/android_kernel_xiaomi_sdm845/
-        cd /home/runner/android_kernel_xiaomi_sdm845
+        cp build.sh android_kernel_xiaomi_sdm845/
+        cd android_kernel_xiaomi_sdm845
         ./build.sh
         
     - name: Verify build output
       run: |
-        if [ -f "/home/runner/android_kernel_xiaomi_sdm845/out/arch/arm64/boot/Image.gz-dtb" ]; then
+        if [ -f "android_kernel_xiaomi_sdm845/out/arch/arm64/boot/Image.gz-dtb" ]; then
           echo "✅ 内核编译成功"
-          ls -la /home/runner/android_kernel_xiaomi_sdm845/out/arch/arm64/boot/Image.gz-dtb
+          ls -la android_kernel_xiaomi_sdm845/out/arch/arm64/boot/Image.gz-dtb
         else
           echo "❌ 内核编译失败，Image.gz-dtb 文件未找到"
           exit 1
@@ -59,10 +59,10 @@ jobs:
     - name: Create anykernel3 package
       run: |
         # 复制内核镜像到 anykernel3 目录
-        cp /home/runner/android_kernel_xiaomi_sdm845/out/arch/arm64/boot/Image.gz-dtb /home/runner/anykernel3/
+        cp android_kernel_xiaomi_sdm845/out/arch/arm64/boot/Image.gz-dtb anykernel3/
         
         # 进入 anykernel3 目录并创建刷机包
-        cd /home/runner/anykernel3/
+        cd anykernel3/
         zip -r polaris_dockerkernel.zip anykernel.sh Image.gz-dtb LICENSE META-INF modules patch tools README.md
         
         # 验证刷机包是否创建成功
@@ -76,7 +76,7 @@ jobs:
         
     - name: Create out directory archive
       run: |
-        cd /home/runner/android_kernel_xiaomi_sdm845
+        cd android_kernel_xiaomi_sdm845
         zip -r kernel_out_directory.zip out/
         
     - name: Upload artifacts
@@ -84,8 +84,8 @@ jobs:
       with:
         name: kernel-build-artifacts
         path: |
-          /home/runner/anykernel3/polaris_dockerkernel.zip
-          /home/runner/android_kernel_xiaomi_sdm845/kernel_out_directory.zip
+          anykernel3/polaris_dockerkernel.zip
+          android_kernel_xiaomi_sdm845/kernel_out_directory.zip
         retention-days: 30
         
     - name: Create Release
@@ -110,7 +110,7 @@ jobs:
         draft: false
         prerelease: false
         files: |
-          /home/runner/anykernel3/polaris_dockerkernel.zip
-          /home/runner/android_kernel_xiaomi_sdm845/kernel_out_directory.zip
+          anykernel3/polaris_dockerkernel.zip
+          android_kernel_xiaomi_sdm845/kernel_out_directory.zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
