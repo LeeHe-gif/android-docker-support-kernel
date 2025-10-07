@@ -14,7 +14,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y apt libssl-dev gcc-arm-linux-gnueabi clang build-essential libncurses5-dev bzip2 make python-is-python3 gcc g++ grep bc curl bison flex openssl lzop ccache unzip libssl-dev zlib1g-dev ninja-build texinfo file ca-certificates ccache wget cmake texinfo ca-certificates zlib1 g-dev xz-utils libelf-dev
+        sudo apt-get install -y libssl-dev gcc-arm-linux-gnueabi clang  build-essential libncurses5-dev bzip2 make python-is-python3 gcc g++ grep bc curl bison flex openssl lzop ccache unzip libssl-dev zlib1g-dev ninja-build texinfo file ca-certificates ccache wget cmake texinfo ca-certificates zlib1 g-dev xz-utils libelf-dev
         
     - name: Clone anykernel3 repository
       run: |
