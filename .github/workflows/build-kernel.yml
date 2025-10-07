@@ -44,6 +44,7 @@ jobs:
       run: |
         cp build.sh android_kernel_xiaomi_sdm845/
         cd android_kernel_xiaomi_sdm845
+        chmod -x build.sh
         ./build.sh
         
     - name: Verify build output
