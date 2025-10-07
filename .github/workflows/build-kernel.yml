@@ -1,0 +1,116 @@
+name: Build Kernel and Create Release
+
+on:
+  workflow_dispatch:  # 手动触发
+
+jobs:
+  build-kernel:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          build-essential \
+          libncurses-dev \
+          bison \
+          flex \
+          libssl-dev \
+          libelf-dev \
+          git \
+          wget \
+          zip \
+          unzip \
+          python3 \
+          make \
+          gcc \
+          g++ \
+          gcc-aarch64-linux-gnu \
+          gcc-arm-linux-gnueabi
+        
+    - name: Clone anykernel3 repository
+      run: |
+        git clone https://github.com/osm0sis/AnyKernel3.git anykernel3
+        
+    - name: Clone kernel source
+      run: |
+        git clone https://github.com/LeeHe-gif/android_kernel_xiaomi_sdm845.git
+        
+    - name: Build kernel
+      run: |
+        cp build.sh /home/runner/android_kernel_xiaomi_sdm845/
+        cd /home/runner/android_kernel_xiaomi_sdm845
+        ./build.sh
+        
+    - name: Verify build output
+      run: |
+        if [ -f "/home/runner/android_kernel_xiaomi_sdm845/out/arch/arm64/boot/Image.gz-dtb" ]; then
+          echo "✅ 内核编译成功"
+          ls -la /home/runner/android_kernel_xiaomi_sdm845/out/arch/arm64/boot/Image.gz-dtb
+        else
+          echo "❌ 内核编译失败，Image.gz-dtb 文件未找到"
+          exit 1
+        fi
+        
+    - name: Create anykernel3 package
+      run: |
+        # 复制内核镜像到 anykernel3 目录
+        cp /home/runner/android_kernel_xiaomi_sdm845/out/arch/arm64/boot/Image.gz-dtb /home/runner/anykernel3/
+        
+        # 进入 anykernel3 目录并创建刷机包
+        cd /home/runner/anykernel3/
+        zip -r polaris_dockerkernel.zip anykernel.sh Image.gz-dtb LICENSE META-INF modules patch tools README.md
+        
+        # 验证刷机包是否创建成功
+        if [ -f "polaris_dockerkernel.zip" ]; then
+          echo "✅ anykernel3 包创建成功"
+          ls -la polaris_dockerkernel.zip
+        else
+          echo "❌ anykernel3 包创建失败"
+          exit 1
+        fi
+        
+    - name: Create out directory archive
+      run: |
+        cd /home/runner/android_kernel_xiaomi_sdm845
+        zip -r kernel_out_directory.zip out/
+        
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: kernel-build-artifacts
+        path: |
+          /home/runner/anykernel3/polaris_dockerkernel.zip
+          /home/runner/android_kernel_xiaomi_sdm845/kernel_out_directory.zip
+        retention-days: 30
+        
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        name: "Polaris Docker Kernel Build"
+        body: |
+          # Polaris Docker Kernel Build
+          
+          自动编译的小米 MIX 2S (polaris) 内核
+          
+          ## 包含文件：
+          - `polaris_dockerkernel.zip` - anykernel33 刷机包
+          - `kernel_out_directory.zip` - 完整的编译输出目录
+          
+          ## 刷机说明：
+          1. 下载 `polaris_dockerkernel.zip`
+          2. 通过 TWRP 刷入
+          3. 重启设备
+          
+          **注意：** 此内核基于 Arrow OS 11 源码编译，支持 Docker 功能。
+        draft: false
+        prerelease: false
+        files: |
+          /home/runner/anykernel3/polaris_dockerkernel.zip
+          /home/runner/android_kernel_xiaomi_sdm845/kernel_out_directory.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
