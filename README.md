@@ -52,6 +52,14 @@ for cg in $cgroups; do
 done
 ```
 
+### 启用网络转发
+
+```Bash
+echo 1 > /proc/sys/net/ipv4/ip_forward
+echo 1 > /proc/sys/net/ipv6/conf/all/forwarding
+echo 1 > /proc/sys/net/ipv6/conf/default/forwarding
+```
+
 ### 检测脚本
 ```Bash
 wget https://github.com/moby/moby/raw/master/contrib/check-config.sh
