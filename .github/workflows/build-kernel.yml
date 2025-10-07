@@ -5,28 +5,50 @@ on:
 
 jobs:
   build-kernel:
-    runs-on: ubuntu-18.04
-    
+    runs-on: ubuntu-latest  # 改为最新版本，使用 Linaro 工具链
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-      
-    - name: Install dependencies
+
+    - name: Install basic dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y curl clang lld llvm build-essential libncurses-dev bison bc flex libssl-dev libelf-dev rsync kmod git cpio wget zip unzip python3 make gcc-7 g++-7 gcc-7-aarch64-linux-gnu gcc-7-arm-linux-gnueabi
+        sudo apt-get install -y \
+          curl clang lld llvm build-essential \
+          libncurses-dev bison bc flex libssl-dev \
+          libelf-dev rsync kmod git cpio wget zip \
+          unzip python3 make xz-utils
+
+    - name: Download and setup Linaro GCC 7.5.0 toolchains
+      run: |
+        # 创建工具链目录
+        sudo mkdir -p /opt/toolchains
+        sudo chmod 777 /opt/toolchains
+        
+        echo "=== 下载 Linaro AArch64 GCC 7.5.0 ==="
+        wget -q https://releases.linaro.org/components/toolchain/binaries/7.5-2019.12/aarch64-linux-gnu/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu.tar.xz
+        tar -xf gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu.tar.xz -C /opt/toolchains/
+        
+        echo "=== 下载 Linaro ARM GCC 7.5.0 ==="
+        wget -q https://releases.linaro.org/components/toolchain/binaries/7.5-2019.12/arm-linux-gnueabi/gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabi.tar.xz
+        tar -xf gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabi.tar.xz -C /opt/toolchains/
+        
+        echo "=== 验证工具链版本 ==="
+        /opt/toolchains/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-gcc --version | head -1
+        /opt/toolchains/gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabi/bin/arm-linux-gnueabi-gcc --version | head -1
         
     - name: Clone anykernel3 repository
       run: |
         git clone https://github.com/osm0sis/AnyKernel3.git anykernel3
         
-    - name: Clone kernel source
+    - name: Clone kernel source and setup KernelSU
       run: |
         git clone https://github.com/LeeHe-gif/android_kernel_xiaomi_sdm845.git
         cd android_kernel_xiaomi_sdm845
         curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s v0.9.5
-        
-    - name: Build kernel
+                
+    - name: Build kernel with Linaro GCC 7.5.0
       run: |
         cp build.sh android_kernel_xiaomi_sdm845/
         cd android_kernel_xiaomi_sdm845
@@ -38,8 +60,12 @@ jobs:
         if [ -f "android_kernel_xiaomi_sdm845/out/arch/arm64/boot/Image.gz-dtb" ]; then
           echo "✅ 内核编译成功"
           ls -la android_kernel_xiaomi_sdm845/out/arch/arm64/boot/Image.gz-dtb
+          echo "文件大小:"
+          du -h android_kernel_xiaomi_sdm845/out/arch/arm64/boot/Image.gz-dtb
         else
           echo "❌ 内核编译失败，Image.gz-dtb 文件未找到"
+          echo "搜索相关文件:"
+          find android_kernel_xiaomi_sdm845/out/ -name "Image*" -type f 2>/dev/null || echo "未找到任何 Image 文件"
           exit 1
         fi
         
@@ -56,6 +82,8 @@ jobs:
         if [ -f "polaris_dockerkernel.zip" ]; then
           echo "✅ anykernel3 包创建成功"
           ls -la polaris_dockerkernel.zip
+          echo "刷机包大小:"
+          du -h polaris_dockerkernel.zip
         else
           echo "❌ anykernel3 包创建失败"
           exit 1
@@ -74,26 +102,40 @@ jobs:
           anykernel3/polaris_dockerkernel.zip
           android_kernel_xiaomi_sdm845/kernel_out_directory.zip
         retention-days: 30
-        
+
     - name: Create Release
       uses: softprops/action-gh-release@v1
       with:
-        name: "Polaris Docker Kernel Build"
+        name: "Polaris Docker Kernel Build (GCC 7.5.0)"
         body: |
           # Polaris Docker Kernel Build
           
-          自动编译的小米 MIX 2S (polaris) 内核
+          使用 Linaro GCC 7.5.0 编译的小米 MIX 2S (polaris) 内核，集成 KernelSU v0.9.5
+          
+          ## 编译环境：
+          - **编译器**: Linaro GCC 7.5.0
+          - **AArch64 工具链**: gcc-linaro-7.5.0-2019.12
+          - **ARM32 工具链**: gcc-linaro-7.5.0-2019.12
+          - **LLVM/Clang**: 系统自带 + LLVM IAS
+          - **KernelSU**: v0.9.5
           
           ## 包含文件：
-          - `polaris_dockerkernel.zip` - anykernel33 刷机包
+          - `polaris_dockerkernel.zip` - AnyKernel3 刷机包
           - `kernel_out_directory.zip` - 完整的编译输出目录
+          
+          ## 特性：
+          - ✅ 完整 Docker 容器支持
+          - ✅ KernelSU root 权限管理
+          - ✅ 基于 Arrow OS 11 内核源码
+          - ✅ 优化性能和稳定性
           
           ## 刷机说明：
           1. 下载 `polaris_dockerkernel.zip`
-          2. 通过 TWRP 刷入
+          2. 通过 TWRP Recovery 刷入
           3. 重启设备
+          4. 安装 KernelSU Manager 应用管理 root 权限
           
-          **注意：** 此内核基于 Arrow OS 11 源码编译，支持 Docker 功能。
+          **注意：** 刷机前请备份重要数据。
         draft: false
         prerelease: false
         files: |
