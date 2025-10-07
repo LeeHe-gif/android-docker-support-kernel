@@ -14,10 +14,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y libssl-dev gcc-arm-linux-gnueabi clang  build-essential libncurses5-dev bzip2 make python-is-python3 gcc g++ grep bc curl bison flex openssl lzop ccache unzip libssl-dev zlib1g-dev ninja-build texinfo file ca-certificates ccache wget cmake texinfo ca-certificates xz-utils libelf-dev
-        wget https://github.com/llvm/llvm-project/releases/download/llvmorg-14.0.6/clang+llvm-14.0.6-aarch64-linux-gnu.tar.xz
-        tar -xvf clang+llvm-14.0.6-aarch64-linux-gnu.tar.xz
-        rm -rf clang+llvm-14.0.6-aarch64-linux-gnu.tar.xz
+        sudo apt-get install -y curl clang lld llvm build-essential libncurses-dev bison bc flex libssl-dev libelf-dev rsync kmod git cpio wget zip unzip python3 make gcc g++ gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi
         
     - name: Clone anykernel3 repository
       run: |
