@@ -14,7 +14,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y curl clang lld llvm build-essential libncurses-dev bison bc flex libssl-dev libelf-dev rsync kmod git cpio wget zip unzip python3 make gcc g++ gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi
+        sudo apt-get install -y curl clang lld llvm build-essential libncurses-dev bison bc flex libssl-dev libelf-dev rsync kmod git cpio wget zip unzip python3 make gcc-7 g++-7 gcc-7-aarch64-linux-gnu gcc-7-arm-linux-gnueabi
         
     - name: Clone anykernel3 repository
       run: |
