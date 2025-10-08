@@ -40,7 +40,7 @@ jobs:
         
     - name: Clone anykernel3 repository
       run: |
-        git clone https://github.com/osm0sis/AnyKernel3.git anykernel3
+        git clone https://github.com/LeeHe-gif/AnyKernel3.git anykernel3
         
     - name: Clone kernel source and setup KernelSU
       run: |
