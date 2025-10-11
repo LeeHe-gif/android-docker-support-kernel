@@ -19,20 +19,20 @@ jobs:
           libssl-dev libelf-dev rsync kmod git cpio \
           wget zip unzip python3 make xz-utils
 
-- name: Download Proton Clang (Android Clang alternative)
-  run: |
-    # 创建工具链目录
-    sudo mkdir -p /opt/toolchains
-    sudo chmod 777 /opt/toolchains
+    - name: Download Proton Clang (Android Clang alternative)
+      run: |
+        # 创建工具链目录
+        sudo mkdir -p /opt/toolchains
+        sudo chmod 777 /opt/toolchains
     
-    echo "=== 下载 Proton Clang 15 ==="
-    # Proton Clang 是基于 AOSP Clang 的增强版本，兼容性更好
-    wget -q https://github.com/kdrag0n/proton-clang/archive/refs/heads/master.tar.gz
-    tar -xf master.tar.gz -C /opt/toolchains/
-    mv /opt/toolchains/proton-clang-master /opt/toolchains/proton-clang
+        echo "=== 下载 Proton Clang 15 ==="
+        # Proton Clang 是基于 AOSP Clang 的增强版本，兼容性更好
+        wget -q https://github.com/kdrag0n/proton-clang/archive/refs/heads/master.tar.gz
+        tar -xf master.tar.gz -C /opt/toolchains/
+        mv /opt/toolchains/proton-clang-master /opt/toolchains/proton-clang
     
-    echo "=== 验证工具链版本 ==="
-    /opt/toolchains/proton-clang/bin/clang --version | head -3
+        echo "=== 验证工具链版本 ==="
+        /opt/toolchains/proton-clang/bin/clang --version | head -3
 
     - name: Clone anykernel3 repository
       run: |
