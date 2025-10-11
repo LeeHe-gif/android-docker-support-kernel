@@ -17,22 +17,23 @@ jobs:
         sudo apt-get install -y \
           build-essential libncurses-dev bison bc flex \
           libssl-dev libelf-dev rsync kmod git cpio \
-          wget zip unzip python3 make xz-utils
+          wget zip unzip python3 make xz-utils ccache
 
-    - name: Download Proton Clang (Android Clang alternative)
+    - name: Download Proton Clang
       run: |
         # 创建工具链目录
         sudo mkdir -p /opt/toolchains
         sudo chmod 777 /opt/toolchains
-    
-        echo "=== 下载 Proton Clang 15 ==="
-        # Proton Clang 是基于 AOSP Clang 的增强版本，兼容性更好
-        wget -q https://github.com/kdrag0n/proton-clang/archive/refs/heads/master.tar.gz
-        tar -xf master.tar.gz -C /opt/toolchains/
-        mv /opt/toolchains/proton-clang-master /opt/toolchains/proton-clang
-    
+        
+        echo "=== 下载 Proton Clang ==="
+        # 使用稳定的 Proton Clang 版本
+        wget -q https://github.com/kdrag0n/proton-clang/archive/refs/tags/20211030.tar.gz
+        tar -xf 20211030.tar.gz -C /opt/toolchains/
+        mv /opt/toolchains/proton-clang-20211030 /opt/toolchains/proton-clang
+        
         echo "=== 验证工具链版本 ==="
         /opt/toolchains/proton-clang/bin/clang --version | head -3
+        /opt/toolchains/proton-clang/bin/ld.lld --version | head -1
 
     - name: Clone anykernel3 repository
       run: |
@@ -47,12 +48,12 @@ jobs:
       run: |
         git clone https://github.com/LeeHe-gif/android_kernel_xiaomi_alioth.git kernel_source
                 
-    - name: Build kernel with Android Clang
+    - name: Build kernel with Proton Clang
       run: |
-        cp build1.sh kernel_source/
+        cp build_clang.sh kernel_source/
         cd kernel_source
-        chmod 755 build1.sh
-        ./build1.sh
+        chmod 755 build_clang.sh
+        ./build_clang.sh
         
     - name: Verify build output
       run: |
@@ -87,57 +88,10 @@ jobs:
           exit 1
         fi
         
-    - name: Create out directory archive
-      run: |
-        cd kernel_source
-        zip -r kernel_boot_directory_clang.zip out/arch/arm64/boot
-        
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
         name: kernel-build-clang-artifacts
         path: |
           anykernel3/alioth_dockerkernel_clang.zip
-          kernel_source/kernel_boot_directory_clang.zip
         retention-days: 30
-
-    - name: Create Release
-      uses: softprops/action-gh-release@v1
-      with:
-        tag_name: "alioth-kernel-clang-build"
-        name: "alioth Docker Kernel Build (Android Clang 15.0.1)"
-        body: |
-          # alioth Docker Kernel Build (Clang)
-          
-          使用 Android Clang 15.0.1 编译的小米 POCO F3/Redmi K40 (alioth) 内核
-          
-          ## 编译环境：
-          - **编译器**: Android Clang 15.0.1 (r458507)
-          - **链接器**: LLD 15.0.1
-          - **GCC 工具链**: AOSP aarch64-linux-android-4.9
-          - **内核版本**: 4.19
-          - **目标设备**: alioth (POCO F3/Redmi K40)
-          
-          ## 包含文件：
-          - `alioth_dockerkernel_clang.zip` - AnyKernel3 刷机包
-          - `kernel_boot_directory_clang.zip` - 完整的编译输出目录
-          
-          ## 编译配置：
-          - ✅ 使用与原版相同的 Android Clang 15.0.1
-          - ✅ LLD 链接器
-          - ✅ 完整 Docker 容器支持
-          - ✅ 基于 Arrow OS 12.1 内核源码
-          
-          ## 刷机说明：
-          1. 下载 `alioth_dockerkernel_clang.zip`
-          2. 通过 TWRP Recovery 刷入
-          3. 重启设备
-          
-          **注意：** 刷机前请备份重要数据。
-        draft: false
-        prerelease: false
-        files: |
-          anykernel3/alioth_dockerkernel_clang.zip
-          kernel_source/kernel_boot_directory_clang.zip
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
