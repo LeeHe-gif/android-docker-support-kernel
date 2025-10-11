@@ -41,6 +41,10 @@ jobs:
     - name: Clone anykernel3 repository
       run: |
         git clone https://github.com/LeeHe-gif/AnyKernel3.git anykernel3
+        cd anykernel3
+        sed -i 's/is_slot_device=0/is_slot_device=1/' anykernel.sh
+        sed -i 's/kernel.string=polaris_docker_Kernel-arrow11-by_LeeHe/kernel.string=alioth_docker_Kernel-arrow12.1-by_LeeHe/' anykernel.sh
+
         
     - name: Clone kernel source and setup KernelSU
       run: |
