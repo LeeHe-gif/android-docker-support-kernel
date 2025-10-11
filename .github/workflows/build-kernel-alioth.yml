@@ -19,29 +19,20 @@ jobs:
           libssl-dev libelf-dev rsync kmod git cpio \
           wget zip unzip python3 make xz-utils
 
-    - name: Download Android Clang 15.0.1 toolchain
-      run: |
-        # 创建工具链目录
-        sudo mkdir -p /opt/toolchains
-        sudo chmod 777 /opt/toolchains
-        
-        echo "=== 下载 Android Clang 15.0.1 ==="
-        # 下载 AOSP Clang 预构建版本
-        wget -q https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/master/clang-r458507.tar.gz
-        tar -xf clang-r458507.tar.gz -C /opt/toolchains/
-        
-        echo "=== 下载 AOSP GCC 交叉编译工具链 ==="
-        # 下载 AOSP GCC 工具链（用于编译部分组件）
-        wget -q https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/+archive/refs/heads/master.tar.gz
-        mkdir -p /opt/toolchains/aarch64-linux-android-4.9
-        tar -xf master.tar.gz -C /opt/toolchains/aarch64-linux-android-4.9/
-        
-        wget -q https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9/+archive/refs/heads/master.tar.gz
-        mkdir -p /opt/toolchains/arm-linux-androideabi-4.9
-        tar -xf master.tar.gz -C /opt/toolchains/arm-linux-androideabi-4.9/
-        
-        echo "=== 验证工具链版本 ==="
-        /opt/toolchains/bin/clang --version | head -3
+- name: Download Proton Clang (Android Clang alternative)
+  run: |
+    # 创建工具链目录
+    sudo mkdir -p /opt/toolchains
+    sudo chmod 777 /opt/toolchains
+    
+    echo "=== 下载 Proton Clang 15 ==="
+    # Proton Clang 是基于 AOSP Clang 的增强版本，兼容性更好
+    wget -q https://github.com/kdrag0n/proton-clang/archive/refs/heads/master.tar.gz
+    tar -xf master.tar.gz -C /opt/toolchains/
+    mv /opt/toolchains/proton-clang-master /opt/toolchains/proton-clang
+    
+    echo "=== 验证工具链版本 ==="
+    /opt/toolchains/proton-clang/bin/clang --version | head -3
 
     - name: Clone anykernel3 repository
       run: |
