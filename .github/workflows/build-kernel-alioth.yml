@@ -1,4 +1,4 @@
-name: Build alioth Kernel and Create Release
+name: Build alioth Kernel with Android Clang
 
 on:
   workflow_dispatch:
@@ -15,77 +15,82 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y \
-          curl clang lld llvm build-essential \
-          libncurses-dev bison bc flex libssl-dev \
-          libelf-dev rsync kmod git cpio wget zip \
-          unzip python3 make xz-utils
+          build-essential libncurses-dev bison bc flex \
+          libssl-dev libelf-dev rsync kmod git cpio \
+          wget zip unzip python3 make xz-utils
 
-    - name: Download and setup Linaro GCC 7.5.0 toolchains
+    - name: Download Android Clang 15.0.1 toolchain
       run: |
         # 创建工具链目录
         sudo mkdir -p /opt/toolchains
         sudo chmod 777 /opt/toolchains
         
-        echo "=== 下载 Linaro AArch64 GCC 7.5.0 ==="
-        wget -q https://releases.linaro.org/components/toolchain/binaries/7.5-2019.12/aarch64-linux-gnu/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu.tar.xz
-        tar -xf gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu.tar.xz -C /opt/toolchains/
+        echo "=== 下载 Android Clang 15.0.1 ==="
+        # 下载 AOSP Clang 预构建版本
+        wget -q https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/master/clang-r458507.tar.gz
+        tar -xf clang-r458507.tar.gz -C /opt/toolchains/
         
-        echo "=== 下载 Linaro ARM GCC 7.5.0 ==="
-        wget -q https://releases.linaro.org/components/toolchain/binaries/7.5-2019.12/arm-linux-gnueabi/gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabi.tar.xz
-        tar -xf gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabi.tar.xz -C /opt/toolchains/
+        echo "=== 下载 AOSP GCC 交叉编译工具链 ==="
+        # 下载 AOSP GCC 工具链（用于编译部分组件）
+        wget -q https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/+archive/refs/heads/master.tar.gz
+        mkdir -p /opt/toolchains/aarch64-linux-android-4.9
+        tar -xf master.tar.gz -C /opt/toolchains/aarch64-linux-android-4.9/
+        
+        wget -q https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9/+archive/refs/heads/master.tar.gz
+        mkdir -p /opt/toolchains/arm-linux-androideabi-4.9
+        tar -xf master.tar.gz -C /opt/toolchains/arm-linux-androideabi-4.9/
         
         echo "=== 验证工具链版本 ==="
-        /opt/toolchains/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-gcc --version | head -1
-        /opt/toolchains/gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabi/bin/arm-linux-gnueabi-gcc --version | head -1
-        
+        /opt/toolchains/bin/clang --version | head -3
+
     - name: Clone anykernel3 repository
       run: |
         git clone https://github.com/LeeHe-gif/AnyKernel3.git anykernel3
         cd anykernel3
         sed -i 's/is_slot_device=0/is_slot_device=1/' anykernel.sh
         sed -i 's/kernel.string=polaris_docker_Kernel-arrow11-by_LeeHe/kernel.string=alioth_docker_Kernel-arrow12.1-by_LeeHe/' anykernel.sh
+        sed -i 's/device.name1=polaris/device.name1=alioth/' anykernel.sh || true
+        sed -i 's/device.name2=polaris/device.name2=alioth/' anykernel.sh || true
 
-        
-    - name: Clone kernel source and setup KernelSU
+    - name: Clone kernel source
       run: |
-        git clone https://github.com/LeeHe-gif/android_kernel_xiaomi_alioth.git
+        git clone https://github.com/LeeHe-gif/android_kernel_xiaomi_alioth.git kernel_source
                 
-    - name: Build kernel with Linaro GCC 7.5.0
+    - name: Build kernel with Android Clang
       run: |
-        cp build1.sh android_kernel_xiaomi_alioth/
-        cd android_kernel_xiaomi_alioth
+        cp build1.sh kernel_source/
+        cd kernel_source
         chmod 755 build1.sh
         ./build1.sh
         
     - name: Verify build output
       run: |
-        if [ -f "android_kernel_xiaomi_alioth/out/arch/arm64/boot/Image.gz-dtb" ]; then
+        if [ -f "kernel_source/out/arch/arm64/boot/Image.gz-dtb" ]; then
           echo "✅ 内核编译成功"
-          ls -la android_kernel_xiaomi_alioth/out/arch/arm64/boot/Image.gz-dtb
+          ls -la kernel_source/out/arch/arm64/boot/Image.gz-dtb
           echo "文件大小:"
-          du -h android_kernel_xiaomi_alioth/out/arch/arm64/boot/Image.gz-dtb
+          du -h kernel_source/out/arch/arm64/boot/Image.gz-dtb
         else
           echo "❌ 内核编译失败，Image.gz-dtb 文件未找到"
           echo "搜索相关文件:"
-          find android_kernel_xiaomi_alioth/out/ -name "Image*" -type f 2>/dev/null || echo "未找到任何 Image 文件"
+          find kernel_source/out/ -name "Image*" -type f 2>/dev/null || echo "未找到任何 Image 文件"
+          if [ -f "kernel_source/build.log" ]; then
+            echo "=== 编译日志最后100行 ==="
+            tail -100 kernel_source/build.log
+          fi
           exit 1
         fi
         
     - name: Create anykernel3 package
       run: |
-        # 复制内核镜像到 anykernel3 目录
-        cp android_kernel_xiaomi_alioth/out/arch/arm64/boot/Image.gz-dtb anykernel3/
-        
-        # 进入 anykernel3 目录并创建刷机包
+        cp kernel_source/out/arch/arm64/boot/Image.gz-dtb anykernel3/
         cd anykernel3/
-        zip -r alioth_dockerkernel.zip anykernel.sh Image.gz-dtb LICENSE META-INF modules patch tools README.md
+        zip -r alioth_dockerkernel_clang.zip . -x "*.git*"
         
-        # 验证刷机包是否创建成功
-        if [ -f "alioth_dockerkernel.zip" ]; then
+        if [ -f "alioth_dockerkernel_clang.zip" ]; then
           echo "✅ anykernel3 包创建成功"
-          ls -la alioth_dockerkernel.zip
-          echo "刷机包大小:"
-          du -h alioth_dockerkernel.zip
+          ls -la alioth_dockerkernel_clang.zip
+          du -h alioth_dockerkernel_clang.zip
         else
           echo "❌ anykernel3 包创建失败"
           exit 1
@@ -93,54 +98,55 @@ jobs:
         
     - name: Create out directory archive
       run: |
-        cd android_kernel_xiaomi_alioth
-        zip -r kernel_boot_directory.zip out/arch/arm64/boot
+        cd kernel_source
+        zip -r kernel_boot_directory_clang.zip out/arch/arm64/boot
         
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: kernel-build-artifacts
+        name: kernel-build-clang-artifacts
         path: |
-          anykernel3/polaris_dockerkernel.zip
-          android_kernel_xiaomi_alioth/kernel_boot_directory.zip
+          anykernel3/alioth_dockerkernel_clang.zip
+          kernel_source/kernel_boot_directory_clang.zip
         retention-days: 30
 
     - name: Create Release
       uses: softprops/action-gh-release@v1
       with:
-        tag_name: "alioth-kernel-build"  # 添加固定的 tag 名称
-        name: "alioth Docker Kernel Build (GCC 7.5.0)"
+        tag_name: "alioth-kernel-clang-build"
+        name: "alioth Docker Kernel Build (Android Clang 15.0.1)"
         body: |
-          # alioth Docker Kernel Build
+          # alioth Docker Kernel Build (Clang)
           
-          使用 Linaro GCC 7.5.0 编译的小米 MIX 2S (polaris) 内核
+          使用 Android Clang 15.0.1 编译的小米 POCO F3/Redmi K40 (alioth) 内核
           
           ## 编译环境：
-          - **编译器**: Linaro GCC 7.5.0
-          - **AArch64 工具链**: gcc-linaro-7.5.0-2019.12
-          - **ARM32 工具链**: gcc-linaro-7.5.0-2019.12
-          - **LLVM/Clang**: 系统自带 + LLVM IAS
+          - **编译器**: Android Clang 15.0.1 (r458507)
+          - **链接器**: LLD 15.0.1
+          - **GCC 工具链**: AOSP aarch64-linux-android-4.9
+          - **内核版本**: 4.19
+          - **目标设备**: alioth (POCO F3/Redmi K40)
           
           ## 包含文件：
-          - `alioth_dockerkernel.zip` - AnyKernel3 刷机包
-          - `kernel_boot_directory.zip` - 完整的编译输出目录
+          - `alioth_dockerkernel_clang.zip` - AnyKernel3 刷机包
+          - `kernel_boot_directory_clang.zip` - 完整的编译输出目录
           
-          ## 特性：
+          ## 编译配置：
+          - ✅ 使用与原版相同的 Android Clang 15.0.1
+          - ✅ LLD 链接器
           - ✅ 完整 Docker 容器支持
           - ✅ 基于 Arrow OS 12.1 内核源码
-          - ✅ 优化性能和稳定性
           
           ## 刷机说明：
-          1. 下载 `alioth_dockerkernel.zip`
+          1. 下载 `alioth_dockerkernel_clang.zip`
           2. 通过 TWRP Recovery 刷入
           3. 重启设备
-          4. 安装 KernelSU Manager 应用管理 root 权限
           
           **注意：** 刷机前请备份重要数据。
         draft: false
         prerelease: false
         files: |
-          anykernel3/alioth_dockerkernel.zip
-          android_kernel_xiaomi_alioth/kernel_boot_directory.zip
+          anykernel3/alioth_dockerkernel_clang.zip
+          kernel_source/kernel_boot_directory_clang.zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
