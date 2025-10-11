@@ -19,21 +19,65 @@ jobs:
           libssl-dev libelf-dev rsync kmod git cpio \
           wget zip unzip python3 make xz-utils ccache
 
-    - name: Download Proton Clang
+    - name: Download Android Clang Toolchain
       run: |
         # 创建工具链目录
         sudo mkdir -p /opt/toolchains
         sudo chmod 777 /opt/toolchains
+    
+        echo "=== 下载可用的 Clang 工具链 ==="
+    
+        # 方案1: 使用 LineageOS 的预构建 Clang
+        echo "尝试下载 LineageOS Clang..."
+        wget -q --timeout=30 --tries=3 https://github.com/LineageOS/android_prebuilts_clang_host_linux-x86/archive/refs/heads/lineage-21.0.tar.gz || \
+        wget -q --timeout=30 --tries=3 https://gitlab.com/LineageOS/android_prebuilts_clang_host_linux-x86/-/archive/lineage-21.0/android_prebuilts_clang_host_linux-x86-lineage-21.0.tar.gz || \
+        echo "LineageOS Clang 下载失败，尝试备用方案"
+    
+        if [ -f "lineage-21.0.tar.gz" ]; then
+            tar -xf lineage-21.0.tar.gz -C /opt/toolchains/
+            mv /opt/toolchains/android_prebuilts_clang_host_linux-x86-lineage-21.0 /opt/toolchains/clang
+        elif [ -f "android_prebuilts_clang_host_linux-x86-lineage-21.0.tar.gz" ]; then
+            tar -xf android_prebuilts_clang_host_linux-x86-lineage-21.0.tar.gz -C /opt/toolchains/
+            mv /opt/toolchains/android_prebuilts_clang_host_linux-x86-lineage-21.0 /opt/toolchains/clang
+        else
+            # 方案2: 使用 AOSP 镜像站的 Clang
+            echo "下载 AOSP 镜像 Clang..."
+            wget -q https://mirrors.tuna.tsinghua.edu.cn/github-release/kdrag0n/proton-clang/LatestRelease/proton-clang-20211030.tar.zst || \
+            wget -q https://github.com/kdrag0n/proton-clang/releases/download/20211030/proton-clang-20211030.tar.zst || \
+            echo "Proton Clang 下载失败"
         
-        echo "=== 下载 Proton Clang ==="
-        # 使用稳定的 Proton Clang 版本
-        wget -q https://github.com/kdrag0n/proton-clang/archive/refs/tags/20211030.tar.gz
-        tar -xf 20211030.tar.gz -C /opt/toolchains/
-        mv /opt/toolchains/proton-clang-20211030 /opt/toolchains/proton-clang
-        
+            if [ -f "proton-clang-20211030.tar.zst" ]; then
+                sudo apt-get install -y zstd
+                tar -xf proton-clang-20211030.tar.zst -C /opt/toolchains/
+                mv /opt/toolchains/proton-clang /opt/toolchains/proton-clang-20211030
+                mv /opt/toolchains/proton-clang-20211030 /opt/toolchains/clang
+            else
+                # 方案3: 使用系统 Clang 并下载独立的 LLD
+                echo "使用系统 Clang 和独立 LLD..."
+                sudo apt-get install -y clang lld llvm llvm-ar llvm-nm llvm-objcopy llvm-objdump llvm-strip
+                mkdir -p /opt/toolchains/clang/bin
+                ln -sf /usr/bin/clang /opt/toolchains/clang/bin/clang
+                ln -sf /usr/bin/ld.lld /opt/toolchains/clang/bin/ld.lld
+                ln -sf /usr/bin/llvm-ar /opt/toolchains/clang/bin/llvm-ar
+                ln -sf /usr/bin/llvm-nm /opt/toolchains/clang/bin/llvm-nm
+                ln -sf /usr/bin/llvm-objcopy /opt/toolchains/clang/bin/llvm-objcopy
+                ln -sf /usr/bin/llvm-objdump /opt/toolchains/clang/bin/llvm-objdump
+                ln -sf /usr/bin/llvm-strip /opt/toolchains/clang/bin/llvm-strip
+            fi
+        fi
+    
         echo "=== 验证工具链版本 ==="
-        /opt/toolchains/proton-clang/bin/clang --version | head -3
-        /opt/toolchains/proton-clang/bin/ld.lld --version | head -1
+        if [ -f "/opt/toolchains/clang/bin/clang" ]; then
+            /opt/toolchains/clang/bin/clang --version | head -3
+        else
+            clang --version | head -3
+        fi
+    
+        if [ -f "/opt/toolchains/clang/bin/ld.lld" ]; then
+            /opt/toolchains/clang/bin/ld.lld --version | head -1
+        else
+            ld.lld --version | head -1
+        fi
 
     - name: Clone anykernel3 repository
       run: |
