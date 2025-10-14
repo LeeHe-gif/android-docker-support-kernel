@@ -1,4 +1,4 @@
-name: Build alioth Kernel with Android Clang
+name: Build alioth Kernel and Create Release
 
 on:
   workflow_dispatch:
@@ -15,127 +15,132 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y \
-          build-essential libncurses-dev bison bc flex \
-          libssl-dev libelf-dev rsync kmod git cpio \
-          wget zip unzip python3 make xz-utils ccache
+          curl clang lld llvm build-essential \
+          libncurses-dev bison bc flex libssl-dev \
+          libelf-dev rsync kmod git cpio wget zip \
+          unzip python3 make xz-utils
 
-    - name: Download Android Clang Toolchain
+    - name: Download and setup Linaro GCC 7.5.0 toolchains
       run: |
         # 创建工具链目录
         sudo mkdir -p /opt/toolchains
         sudo chmod 777 /opt/toolchains
-    
-        echo "=== 下载可用的 Clang 工具链 ==="
-    
-        # 方案1: 使用 LineageOS 的预构建 Clang
-        echo "尝试下载 LineageOS Clang..."
-        wget -q --timeout=30 --tries=3 https://github.com/LineageOS/android_prebuilts_clang_host_linux-x86/archive/refs/heads/lineage-21.0.tar.gz || \
-        wget -q --timeout=30 --tries=3 https://gitlab.com/LineageOS/android_prebuilts_clang_host_linux-x86/-/archive/lineage-21.0/android_prebuilts_clang_host_linux-x86-lineage-21.0.tar.gz || \
-        echo "LineageOS Clang 下载失败，尝试备用方案"
-    
-        if [ -f "lineage-21.0.tar.gz" ]; then
-            tar -xf lineage-21.0.tar.gz -C /opt/toolchains/
-            mv /opt/toolchains/android_prebuilts_clang_host_linux-x86-lineage-21.0 /opt/toolchains/clang
-        elif [ -f "android_prebuilts_clang_host_linux-x86-lineage-21.0.tar.gz" ]; then
-            tar -xf android_prebuilts_clang_host_linux-x86-lineage-21.0.tar.gz -C /opt/toolchains/
-            mv /opt/toolchains/android_prebuilts_clang_host_linux-x86-lineage-21.0 /opt/toolchains/clang
-        else
-            # 方案2: 使用 AOSP 镜像站的 Clang
-            echo "下载 AOSP 镜像 Clang..."
-            wget -q https://mirrors.tuna.tsinghua.edu.cn/github-release/kdrag0n/proton-clang/LatestRelease/proton-clang-20211030.tar.zst || \
-            wget -q https://github.com/kdrag0n/proton-clang/releases/download/20211030/proton-clang-20211030.tar.zst || \
-            echo "Proton Clang 下载失败"
         
-            if [ -f "proton-clang-20211030.tar.zst" ]; then
-                sudo apt-get install -y zstd
-                tar -xf proton-clang-20211030.tar.zst -C /opt/toolchains/
-                mv /opt/toolchains/proton-clang /opt/toolchains/proton-clang-20211030
-                mv /opt/toolchains/proton-clang-20211030 /opt/toolchains/clang
-            else
-                # 方案3: 使用系统 Clang 并下载独立的 LLD
-                echo "使用系统 Clang 和独立 LLD..."
-                sudo apt-get install -y clang lld llvm llvm-ar llvm-nm llvm-objcopy llvm-objdump llvm-strip
-                mkdir -p /opt/toolchains/clang/bin
-                ln -sf /usr/bin/clang /opt/toolchains/clang/bin/clang
-                ln -sf /usr/bin/ld.lld /opt/toolchains/clang/bin/ld.lld
-                ln -sf /usr/bin/llvm-ar /opt/toolchains/clang/bin/llvm-ar
-                ln -sf /usr/bin/llvm-nm /opt/toolchains/clang/bin/llvm-nm
-                ln -sf /usr/bin/llvm-objcopy /opt/toolchains/clang/bin/llvm-objcopy
-                ln -sf /usr/bin/llvm-objdump /opt/toolchains/clang/bin/llvm-objdump
-                ln -sf /usr/bin/llvm-strip /opt/toolchains/clang/bin/llvm-strip
-            fi
-        fi
-    
+        echo "=== 下载 Linaro AArch64 GCC 7.5.0 ==="
+        wget -q https://releases.linaro.org/components/toolchain/binaries/7.5-2019.12/aarch64-linux-gnu/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu.tar.xz
+        tar -xf gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu.tar.xz -C /opt/toolchains/
+        
+        echo "=== 下载 Linaro ARM GCC 7.5.0 ==="
+        wget -q https://releases.linaro.org/components/toolchain/binaries/7.5-2019.12/arm-linux-gnueabi/gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabi.tar.xz
+        tar -xf gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabi.tar.xz -C /opt/toolchains/
+        
         echo "=== 验证工具链版本 ==="
-        if [ -f "/opt/toolchains/clang/bin/clang" ]; then
-            /opt/toolchains/clang/bin/clang --version | head -3
-        else
-            clang --version | head -3
-        fi
-    
-        if [ -f "/opt/toolchains/clang/bin/ld.lld" ]; then
-            /opt/toolchains/clang/bin/ld.lld --version | head -1
-        else
-            ld.lld --version | head -1
-        fi
-
+        /opt/toolchains/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-gcc --version | head -1
+        /opt/toolchains/gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabi/bin/arm-linux-gnueabi-gcc --version | head -1
+        
     - name: Clone anykernel3 repository
       run: |
         git clone https://github.com/LeeHe-gif/AnyKernel3.git anykernel3
         cd anykernel3
         sed -i 's/is_slot_device=0/is_slot_device=1/' anykernel.sh
         sed -i 's/kernel.string=polaris_docker_Kernel-arrow11-by_LeeHe/kernel.string=alioth_docker_Kernel-arrow12.1-by_LeeHe/' anykernel.sh
-        sed -i 's/device.name1=polaris/device.name1=alioth/' anykernel.sh || true
-        sed -i 's/device.name2=polaris/device.name2=alioth/' anykernel.sh || true
 
-    - name: Clone kernel source
+        
+    - name: Clone kernel source and setup KernelSU
       run: |
-        git clone https://github.com/LeeHe-gif/android_kernel_xiaomi_alioth.git kernel_source
+        git clone https://github.com/LeeHe-gif/android_kernel_xiaomi_alioth.git
                 
-    - name: Build kernel with Proton Clang
+    - name: Build kernel with Linaro GCC 7.5.0
       run: |
-        cp build_clang.sh kernel_source/
-        cd kernel_source
-        chmod 755 build_clang.sh
-        ./build_clang.sh
+        cp build1.sh android_kernel_xiaomi_alioth/
+        cd android_kernel_xiaomi_alioth
+        chmod 755 build1.sh
+        ./build1.sh
         
     - name: Verify build output
       run: |
-        if [ -f "kernel_source/out/arch/arm64/boot/Image.gz-dtb" ]; then
+        if [ -f "android_kernel_xiaomi_alioth/out/arch/arm64/boot/Image.gz-dtb" ]; then
           echo "✅ 内核编译成功"
-          ls -la kernel_source/out/arch/arm64/boot/Image.gz-dtb
+          ls -la android_kernel_xiaomi_alioth/out/arch/arm64/boot/Image.gz-dtb
           echo "文件大小:"
-          du -h kernel_source/out/arch/arm64/boot/Image.gz-dtb
+          du -h android_kernel_xiaomi_alioth/out/arch/arm64/boot/Image.gz-dtb
         else
           echo "❌ 内核编译失败，Image.gz-dtb 文件未找到"
           echo "搜索相关文件:"
-          find kernel_source/out/ -name "Image*" -type f 2>/dev/null || echo "未找到任何 Image 文件"
-          if [ -f "kernel_source/build.log" ]; then
-            echo "=== 编译日志最后100行 ==="
-            tail -100 kernel_source/build.log
-          fi
+          find android_kernel_xiaomi_alioth/out/ -name "Image*" -type f 2>/dev/null || echo "未找到任何 Image 文件"
           exit 1
         fi
         
     - name: Create anykernel3 package
       run: |
-        cp kernel_source/out/arch/arm64/boot/Image.gz-dtb anykernel3/
-        cd anykernel3/
-        zip -r alioth_dockerkernel_clang.zip . -x "*.git*"
+        # 复制内核镜像到 anykernel3 目录
+        cp android_kernel_xiaomi_alioth/out/arch/arm64/boot/Image.gz-dtb anykernel3/
         
-        if [ -f "alioth_dockerkernel_clang.zip" ]; then
+        # 进入 anykernel3 目录并创建刷机包
+        cd anykernel3/
+        zip -r alioth_dockerkernel.zip anykernel.sh Image.gz-dtb LICENSE META-INF modules patch tools README.md
+        
+        # 验证刷机包是否创建成功
+        if [ -f "alioth_dockerkernel.zip" ]; then
           echo "✅ anykernel3 包创建成功"
-          ls -la alioth_dockerkernel_clang.zip
-          du -h alioth_dockerkernel_clang.zip
+          ls -la alioth_dockerkernel.zip
+          echo "刷机包大小:"
+          du -h alioth_dockerkernel.zip
         else
           echo "❌ anykernel3 包创建失败"
           exit 1
         fi
         
+    - name: Create out directory archive
+      run: |
+        cd android_kernel_xiaomi_alioth
+        zip -r kernel_boot_directory.zip out/arch/arm64/boot
+        
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: kernel-build-clang-artifacts
+        name: kernel-build-artifacts
         path: |
-          anykernel3/alioth_dockerkernel_clang.zip
+          anykernel3/polaris_dockerkernel.zip
+          android_kernel_xiaomi_alioth/kernel_boot_directory.zip
         retention-days: 30
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: "alioth-kernel-build"  # 添加固定的 tag 名称
+        name: "alioth Docker Kernel Build (GCC 7.5.0)"
+        body: |
+          # alioth Docker Kernel Build
+          
+          使用 Linaro GCC 7.5.0 编译的小米 MIX 2S (polaris) 内核
+          
+          ## 编译环境：
+          - **编译器**: Linaro GCC 7.5.0
+          - **AArch64 工具链**: gcc-linaro-7.5.0-2019.12
+          - **ARM32 工具链**: gcc-linaro-7.5.0-2019.12
+          - **LLVM/Clang**: 系统自带 + LLVM IAS
+          
+          ## 包含文件：
+          - `alioth_dockerkernel.zip` - AnyKernel3 刷机包
+          - `kernel_boot_directory.zip` - 完整的编译输出目录
+          
+          ## 特性：
+          - ✅ 完整 Docker 容器支持
+          - ✅ 基于 Arrow OS 12.1 内核源码
+          - ✅ 优化性能和稳定性
+          
+          ## 刷机说明：
+          1. 下载 `alioth_dockerkernel.zip`
+          2. 通过 TWRP Recovery 刷入
+          3. 重启设备
+          4. 安装 KernelSU Manager 应用管理 root 权限
+          
+          **注意：** 刷机前请备份重要数据。
+        draft: false
+        prerelease: false
+        files: |
+          anykernel3/alioth_dockerkernel.zip
+          android_kernel_xiaomi_alioth/kernel_boot_directory.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
