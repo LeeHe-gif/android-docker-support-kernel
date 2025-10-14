@@ -56,6 +56,7 @@ jobs:
         cd android_kernel_xiaomi_alioth
         chmod 755 build1.sh
         ./build1.sh
+        ls -la out/arch/arm64/boot/Image.gz-dtb
         
     - name: Verify build output
       run: |
