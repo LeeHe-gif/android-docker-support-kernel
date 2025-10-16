@@ -9,8 +9,8 @@ mkdir -p out
 
 echo "=== 步骤2: 设置环境 ==="
 export ARCH=arm64
-export CROSS_COMPILE=/opt/aarch64-linux-android-4.9/bin/aarch64-linux-gnu-
-export CROSS_COMPILE_ARM32=/opt/toolchains/arm-linux-androideabi-4.9/bin/arm-linux-gnueabi-
+export CROSS_COMPILE=/opt/toolchains/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-
+export CROSS_COMPILE_ARM32=/opt/toolchains/gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabi/bin/arm-linux-gnueabi-
 
 # 添加编译选项来忽略警告
 export KCFLAGS="
