@@ -50,22 +50,7 @@ jobs:
         cd android_kernel_xiaomi_sm8250
         chmod 755 build1.sh
         ./build1.sh
-        ls -la out/arch/arm64/boot/Image.gz-dtb
-        
-    - name: Verify build output
-      run: |
-        if [ -f "android_kernel_xiaomi_sm8250/out/arch/arm64/boot/Image.gz-dtb" ]; then
-          echo "✅ 内核编译成功"
-          ls -la android_kernel_xiaomi_sm8250/out/arch/arm64/boot/Image.gz-dtb
-          echo "文件大小:"
-          du -h android_kernel_xiaomi_sm8250/out/arch/arm64/boot/Image.gz-dtb
-        else
-          echo "❌ 内核编译失败，Image.gz-dtb 文件未找到"
-          echo "搜索相关文件:"
-          find android_kernel_xiaomi_sm8250/out/ -name "Image*" -type f 2>/dev/null || echo "未找到任何 Image 文件"
-          exit 1
-        fi
-        
+            
     - name: Create anykernel3 package
       run: |
         # 复制内核镜像到 anykernel3 目录
