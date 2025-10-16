@@ -1,5 +1,4 @@
 #!/bin/bash
-cd ./android_kernel_xiaomi_alioth
 
 echo "=== 步骤1: 清理 ==="
 make clean
