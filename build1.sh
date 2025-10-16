@@ -23,7 +23,7 @@ export KCFLAGS="
 "
 
 echo "=== 步骤3: 配置内核 ==="
-make O=out my_alioth_defconfig
+make O=out alioth_defconfig
 
 echo "=== 步骤4: 开始编译（纯GCC）==="
 make -j$(nproc --all) O=out
