@@ -20,7 +20,7 @@ jobs:
           libelf-dev rsync kmod git cpio wget zip \
           unzip python3 python-is-python3 make xz-utils
 
-        - name: Download and setup Linaro GCC 7.5.0 toolchains
+    - name: Download and setup Linaro GCC 7.5.0 toolchains
       run: |
         # 创建工具链目录
         sudo mkdir -p /opt/toolchains
