@@ -23,7 +23,7 @@ jobs:
     - name: Download and setup proton-clang-13.0 toolchains
       run: |
         # 创建工具链目录
-        sudo mkdir -p /opt
+        sudo mkdir -p /opt/toolchains
         sudo chmod 777 /opt
 
         echo "=== 下载 Linaro AArch64 GCC 7.5.0 ==="
