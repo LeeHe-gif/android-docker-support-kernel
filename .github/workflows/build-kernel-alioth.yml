@@ -29,9 +29,6 @@ jobs:
         wget https://github.com/kdrag0n/proton-clang/archive/refs/tags/20210522.tar.gz
         tar -xf 20210522.tar.gz
         sudo chmod 777 proton-clang-20210522
-        ls
-        ls aarch64-linux-android-4.9/
-        ls arm-linux-androideabi-4.9/
 
     - name: Clone kernel source and setup KernelSU
       run: |
