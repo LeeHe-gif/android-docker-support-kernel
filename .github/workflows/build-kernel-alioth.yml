@@ -28,6 +28,7 @@ jobs:
         cd /opt
         wget https://github.com/kdrag0n/proton-clang/archive/refs/tags/20210522.tar.gz
         tar -xf 20210522.tar.gz
+        sudo chmod 777 proton-clang-20210522
         ls
 
     - name: Clone kernel source and setup KernelSU
