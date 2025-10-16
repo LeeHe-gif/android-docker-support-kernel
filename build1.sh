@@ -9,11 +9,18 @@ mkdir -p out
 
 echo "=== 步骤2: 设置环境 ==="
 export ARCH=arm64
-export CROSS_COMPILE=/opt/toolchains/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-
-export CROSS_COMPILE_ARM32=/opt/toolchains/gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabi/bin/arm-linux-gnueabi-
+export CC=/opt/proton-clang-20210522/bin/clang
+export AR=/opt/proton-clang-20210522/bin/llvm-ar
+export NM=/opt/proton-clang-20210522/bin/llvm-nm
+export OBJCOPY=/opt/proton-clang-20210522/bin/llvm-objcopy
+export OBJDUMP=/opt/proton-clang-20210522/bin/llvm-objdump
+export STRIP=/opt/proton-clang-20210522/bin/llvm-strip
+export CROSS_COMPILE=/opt/proton-clang-20210522/bin/aarch64-linux-gnu-
+export CROSS_COMPILE_ARM32=/proton-clang-20210522/bin/arm-linux-gnueabi-
 
 # 添加编译选项来忽略警告
 export KCFLAGS="
+-Wformat
 -Wno-format
 -Wno-uninitialized
 -Wno-unused-variable
