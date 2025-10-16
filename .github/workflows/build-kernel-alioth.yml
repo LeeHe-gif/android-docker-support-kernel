@@ -25,6 +25,18 @@ jobs:
         # 创建工具链目录
         sudo mkdir -p /opt
         sudo chmod 777 /opt
+
+        echo "=== 下载 Linaro AArch64 GCC 7.5.0 ==="
+        wget -q https://releases.linaro.org/components/toolchain/binaries/7.5-2019.12/aarch64-linux-gnu/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu.tar.xz
+        tar -xf gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu.tar.xz -C /opt/toolchains/
+        
+        echo "=== 下载 Linaro ARM GCC 7.5.0 ==="
+        wget -q https://releases.linaro.org/components/toolchain/binaries/7.5-2019.12/arm-linux-gnueabi/gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabi.tar.xz
+        tar -xf gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabi.tar.xz -C /opt/toolchains/
+        
+        echo "=== 验证工具链版本 ==="
+        /opt/toolchains/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-gcc --version | head -1
+        /opt/toolchains/gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabi/bin/arm-linux-gnueabi-gcc --version | head -1
         cd /opt
         wget https://github.com/kdrag0n/proton-clang/archive/refs/tags/20210522.tar.gz
         tar -xf 20210522.tar.gz
