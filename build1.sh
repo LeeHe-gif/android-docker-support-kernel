@@ -13,7 +13,7 @@ export AR=/opt/proton-clang-20210522/bin/llvm-ar
 export NM=/opt/proton-clang-20210522/bin/llvm-nm
 export OBJCOPY=/opt/proton-clang-20210522/bin/llvm-objcopy
 export OBJDUMP=/opt/proton-clang-20210522/bin/llvm-objdump
-# export STRIP=/opt/proton-clang-20210522/bin/llvm-strip
+export STRIP=/opt/proton-clang-20210522/bin/llvm-strip
 export CROSS_COMPILE=/opt/toolchains/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-
 export CROSS_COMPILE_ARM32=/opt/toolchains/gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabi/bin/arm-linux-gnueabi-
 
