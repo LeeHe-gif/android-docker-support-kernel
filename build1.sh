@@ -13,7 +13,13 @@ export CROSS_COMPILE=/opt/aarch64-linux-android-4.9/bin/aarch64-linux-gnu-
 export CROSS_COMPILE_ARM32=/opt/toolchains/arm-linux-androideabi-4.9/bin/arm-linux-gnueabi-
 
 # 添加编译选项来忽略警告
-export KCFLAGS="-Wno-format -Wno-uninitialized -Wno-unused-variable -Wno-unused-but-set-variable -Wno-maybe-uninitialized -Wno-sign-compare"
+export KCFLAGS="
+-Wno-format 
+-Wno-uninitialized 
+-Wno-unused-variable
+-Wno-unused-but-set-variable -Wno-maybe-uninitialized 
+-Wno-sign-compare -enable-trivial-auto-var-init-zero-knowing-it-will-be-removed-from-clang
+"
 
 echo "=== 步骤3: 配置内核 ==="
 make O=out my_alioth_defconfig
