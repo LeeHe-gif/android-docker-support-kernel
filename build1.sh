@@ -14,10 +14,11 @@ export CROSS_COMPILE_ARM32=/opt/toolchains/arm-linux-androideabi-4.9/bin/arm-lin
 
 # 添加编译选项来忽略警告
 export KCFLAGS="
--Wno-format 
--Wno-uninitialized 
+-Wno-format
+-Wno-uninitialized
 -Wno-unused-variable
--Wno-unused-but-set-variable -Wno-maybe-uninitialized 
+-Wno-unused-but-set-variable
+-Wno-maybe-uninitialized
 -Wno-sign-compare -enable-trivial-auto-var-init-zero-knowing-it-will-be-removed-from-clang
 "
 
