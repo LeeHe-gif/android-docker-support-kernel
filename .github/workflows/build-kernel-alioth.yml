@@ -30,8 +30,12 @@ jobs:
         git clone https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_arm_arm-linux-androideabi-4.9.git --depth=1 arm-linux-androideabi-4.9
         wget https://github.com/kdrag0n/proton-clang/archive/refs/tags/20210522.tar.gz
         tar -xf 20210522.tar.gz
+        sudo chmod 777 aarch64-linux-android-4.9
+        sudo chmod 777 arm-linux-androideabi-4.9
         sudo chmod 777 proton-clang-20210522
         ls
+        ls aarch64-linux-android-4.9/
+        ls arm-linux-androideabi-4.9/
 
     - name: Clone kernel source and setup KernelSU
       run: |
