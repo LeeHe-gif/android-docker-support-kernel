@@ -21,4 +21,10 @@ make O=out my_alioth_defconfig
 echo "=== 步骤4: 开始编译（纯GCC）==="
 make -j$(nproc --all) O=out
 
-echo "=== 编译完成! ==="
+echo "=== 步骤4：检查编译结果 ==="
+if [ -f "out/arch/arm64/boot/Image.gz-dtb" ]; then
+    echo "✅ Image.gz 编译成功"
+else
+    echo "❌ 内核编译失败 - Image.gz-dtb 未生成"
+    exit 1
+fi
