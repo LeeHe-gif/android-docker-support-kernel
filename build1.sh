@@ -10,8 +10,6 @@ echo "=== 步骤2: 设置环境 ==="
 export ARCH=arm64
 export CC=/opt/proton-clang-20210522/bin/clang
 export CLANG_TRIPLE=aarch64-linux-gnu-
-export CROSS_COMPILE=/opt/aarch64-linux-android-4.9/bin/aarch64-linux-android-
-export CROSS_COMPILE_ARM32=/opt/arm-linux-androideabi-4.9/bin/arm-linux-androideabi-
 
 # 添加编译选项来忽略警告
 export KCFLAGS="
