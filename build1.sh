@@ -9,11 +9,7 @@ mkdir -p out
 echo "=== 步骤2: 设置环境 ==="
 export ARCH=arm64
 export CC=/opt/proton-clang-20210522/bin/clang
-export AR=/opt/proton-clang-20210522/bin/llvm-ar
-export NM=/opt/proton-clang-20210522/bin/llvm-nm
-export OBJCOPY=/opt/proton-clang-20210522/bin/llvm-objcopy
-export OBJDUMP=/opt/proton-clang-20210522/bin/llvm-objdump
-export STRIP=/opt/proton-clang-20210522/bin/llvm-strip
+export CLANG_TRIPLE=aarch64-linux-gnu-
 export CROSS_COMPILE=/opt/aarch64-linux-android-4.9/bin/aarch64-linux-android-
 export CROSS_COMPILE_ARM32=/opt/arm-linux-androideabi-4.9/bin/arm-linux-androideabi-
 
