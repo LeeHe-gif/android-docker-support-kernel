@@ -15,10 +15,10 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y \
-          curl clang lld llvm build-essential \
+          curl build-essential \
           libncurses-dev bison bc flex libssl-dev \
           libelf-dev rsync kmod git cpio wget zip \
-          unzip python3 python-is-python3 make xz-utils
+          unzip python3 python-is-python3 make xz-utils python3-pip ccache rsync
 
     - name: Download and setup proton-clang-13.0 toolchains
       run: |
