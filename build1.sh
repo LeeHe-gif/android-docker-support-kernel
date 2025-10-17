@@ -11,6 +11,9 @@ echo "=======检查ar：======="
 echo "=======检查nm：======="
 ~/proton-clang-20210522/bin/llvm-nm --version
 
+echo "=======检查ld：======="
+~/proton-clang-20210522/bin/ld.lld -v
+
 echo "=======查objcopy：======="
 ~/proton-clang-20210522/bin/llvm-objcopy --version
 
@@ -42,6 +45,7 @@ make -j$(nproc --all) O=out \
     CC=~/proton-clang-20210522/bin/clang \
     AR=~/proton-clang-20210522/bin/llvm-ar \
     NM=~/proton-clang-20210522/bin/llvm-nm \
+    LD=~/proton-clang-20210522/bin/ld.lld \
     OBJCOPY=~/proton-clang-20210522/bin/llvm-objcopy \
     OBJDUMP=~/proton-clang-20210522/bin/llvm-objdump \
     STRIP=~/proton-clang-20210522/bin/llvm-strip \
