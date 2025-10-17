@@ -1,8 +1,7 @@
 #!/bin/bash
-echo "===步骤1: 设置交叉编译器==="
-# 创建工具链目录
-wget https://github.com/kdrag0n/proton-clang/archive/refs/tags/20210522.tar.gz
-tar -xf 20210522.tar.gz
+echo "=== 步骤1: 设置proton-clang 13.0.0 ==="
+
+git clone https://github.com/kdrag0n/proton-clang.git proton-clang-20210522
 
 echo "=== 步骤2: 清理 ==="
 make clean
