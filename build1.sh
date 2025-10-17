@@ -31,15 +31,11 @@ arm-linux-gnueabi-gcc -v
 
 cd ~/work/polaris-arrowos11-docker-support-kernel/polaris-arrowos11-docker-support-kernel/android_kernel_xiaomi_sm8250/
 
-echo "=== 步骤2: 清理 ==="
-make clean
-make mrproper 
-
-echo "=== 步骤3: 配置内核 ==="
+echo "=== 步骤2: 配置内核 ==="
 export ARCH=arm64
 make O=out my_alioth_defconfig
 
-echo "=== 步骤4: 开始编译 ==="
+echo "=== 步骤3: 开始编译 ==="
 printf '\1\N\Y' | make -j$(nproc --all) O=out \
     ARCH=arm64 \
     CC=~/proton-clang-20210522/bin/clang \
@@ -51,9 +47,9 @@ printf '\1\N\Y' | make -j$(nproc --all) O=out \
     STRIP=~/proton-clang-20210522/bin/llvm-strip \
     CROSS_COMPILE=aarch64-linux-gnu- \
     CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
-    KCFLAGS="-Wformat -Wsometimes-uninitialized -Wformat-security -Wunknown-warning-option -Wunused-result -Wuninitialized -Wno-error -Wno-pointer-sign -enable-trivial-auto-var-init-zero-knowing-it-will-be-removed-from-clang"     
-
-echo "=== 步骤5：检查编译结果 ==="
+    KCFLAGS="-Wformat -Wsometimes-uninitialized -Wformat-security -Wunknown-warning-option -Wunused-result -Wuninitialized -Wno-error -Wno-pointer-sign -enable-trivial-auto-var-init-zero-knowing-it-will-be-removed-from-clang"
+    
+echo "=== 步骤4：检查编译结果 ==="
 if [ -f "out/arch/arm64/boot/Image.gz-dtb" ]; then
     echo "✅ 内核编译成功"
 else
