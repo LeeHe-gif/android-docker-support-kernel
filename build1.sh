@@ -1,7 +1,7 @@
 #!/bin/bash
 echo "=== 步骤1: 设置proton-clang 13.0.0 ==="
 cd ~
-git clone --depth 1 https://github.com/kdrag0n/proton-clang.git
+git clone --depth 1 https://github.com/kdrag0n/proton-clang.git proton-clang-20210522
 echo "=======检查cc：======="
 ~/proton-clang-20210522/bin/clang -v
 
@@ -33,7 +33,7 @@ if [ ! -f "~/proton-clang/bin/clang" ]; then
     exit 1
 fi
 
-cd ~
+cd ~/work/polaris-arrowos11-docker-support-kernel/polaris-arrowos11-docker-support-kernel/android_kernel_xiaomi_sm8250/
 
 echo "=== 步骤2: 清理 ==="
 make clean
