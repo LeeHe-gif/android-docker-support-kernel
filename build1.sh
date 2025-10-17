@@ -12,7 +12,6 @@ make O=out alioth_defconfig
 
 echo "=== 步骤4: 开始编译 ==="
 make -j$(nproc --all) O=out \
-    ARCH=arm64 \
     CC=proton-clang/bin/clang \
     AR=proton-clang/bin/llvm-ar \
     NM=proton-clang/bin/llvm-nm \
