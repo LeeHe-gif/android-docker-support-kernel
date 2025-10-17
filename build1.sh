@@ -31,7 +31,7 @@ make -j$(nproc --all) O=out \
     LD=/opt/proton-clang-20210522/bin/ld.lld \
     CROSS_COMPILE=/opt/proton-clang-20210522/bin/aarch64-linux-gnu- \
     CROSS_COMPILE_ARM32=/opt/proton-clang-20210522/bin/arm-linux-gnueabi- \
-    KCFLAGS="-Wno-pointer-sign -Wno-array-bounds"
+    KCFLAGS="-Wno-format -Wno-uninitialized -Wno-unused-variable -Wno-unused-but-set-variable -Wno-maybe-uninitialized -Wno-sign-compare -Wno-pointer-sign"
 
 echo "=== 步骤5：检查编译结果 ==="
 if [ -f "out/arch/arm64/boot/Image.gz-dtb" ]; then
