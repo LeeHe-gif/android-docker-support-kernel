@@ -27,7 +27,7 @@ echo "=======检查arm-linux-gnueabi-gcc：======="
 arm-linux-gnueabi-gcc -v
 
 # 验证编译器是否存在
-if [ ! -f "~/proton-clang/bin/clang" ]; then
+if [ ! -f "~/proton-clang-20210522" ]; then
     echo "❌ 错误：clang编译器未找到"
     echo "请检查proton-clang是否正确下载和解压"
     exit 1
