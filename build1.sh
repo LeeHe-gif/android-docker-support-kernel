@@ -1,6 +1,12 @@
 #!/bin/bash
 echo "=== 步骤1: 设置proton-clang 13.0.0 ==="
 git clone -b master --depth 1 https://github.com/kdrag0n/proton-clang.git
+cd proton-clang/bin
+echo "-----------------"
+ls -l 
+echo "-----------------"
+sudo chmod 755 *
+cd ../..
 
 echo "=== 步骤2: 清理 ==="
 make clean
