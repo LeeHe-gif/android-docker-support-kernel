@@ -1,28 +1,25 @@
 #!/bin/bash
 echo "===步骤1: 设置交叉编译器==="
 # 创建工具链目录
-sudo mkdir -p /opt
-sudo chmod 777 /opt
 wget https://github.com/kdrag0n/proton-clang/archive/refs/tags/20210522.tar.gz
 tar -xf 20210522.tar.gz
-sudo chmod 777 proton-clang-20210522
 
 echo "=== 步骤2: 清理 ==="
 make clean
 make mrproper 
 
 echo "=== 步骤3: 配置内核 ==="
-make O=out my_polaris_defconfig
+make O=out polaris_defconfig
 
 echo "=== 步骤4: 开始编译 ==="
 make -j$(nproc --all) O=out \
     ARCH=arm64 \
-    CC=/opt/proton-clang-20210522/bin/clang \
-    AR=/opt/proton-clang-20210522/bin/llvm-ar \
-    NM=/opt/proton-clang-20210522/bin/llvm-nm \
-    OBJCOPY=/opt/proton-clang-20210522/bin/llvm-objcopy \
-    OBJDUMP=/opt/proton-clang-20210522/bin/llvm-objdump \
-    STRIP=/opt/proton-clang-20210522/bin/llvm-strip \
+    CC=proton-clang-20210522/bin/clang \
+    AR=proton-clang-20210522/bin/llvm-ar \
+    NM=proton-clang-20210522/bin/llvm-nm \
+    OBJCOPY=proton-clang-20210522/bin/llvm-objcopy \
+    OBJDUMP=proton-clang-20210522/bin/llvm-objdump \
+    STRIP=proton-clang-20210522/bin/llvm-strip \
     CROSS_COMPILE=aarch64-linux-gnu- \
     CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
     KCFLAGS="-Wformat-security -Wunknown-warning-option -Wunused-result -Wuninitialized -Wno-error -Wno-pointer-sign -enable-trivial-auto-var-init-zero-knowing-it-will-be-removed-from-clang"
