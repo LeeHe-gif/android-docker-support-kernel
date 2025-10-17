@@ -22,6 +22,7 @@ export KCFLAGS="-Wno-format -Wno-uninitialized -Wno-unused-variable -Wno-unused-
 
 echo "=== 步骤3: 配置内核 ==="
 make O=out ARCH=arm64 alioth_defconfig
+ls -l out/
 
 echo "=== 步骤4: 开始编译（使用 Proton Clang）==="
 make -j$(nproc --all) O=out \
