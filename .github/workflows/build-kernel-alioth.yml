@@ -30,6 +30,8 @@ jobs:
       run: |
         cp build1.sh android_kernel_xiaomi_sm8250/
         cd android_kernel_xiaomi_sm8250
+        echo "=== 步骤1: 设置proton-clang 13.0.0 ==="
+        git clone https://github.com/kdrag0n/proton-clang.git proton-clang-20210522
         chmod 755 build1.sh
         ./build1.sh
             
