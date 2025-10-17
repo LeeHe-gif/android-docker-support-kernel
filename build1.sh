@@ -26,13 +26,6 @@ aarch64-linux-gnu-gcc -v
 echo "=======检查arm-linux-gnueabi-gcc：======="
 arm-linux-gnueabi-gcc -v
 
-# 验证编译器是否存在
-if [ ! -f "~/proton-clang-20210522" ]; then
-    echo "❌ 错误：clang编译器未找到"
-    echo "请检查proton-clang是否正确下载和解压"
-    exit 1
-fi
-
 cd ~/work/polaris-arrowos11-docker-support-kernel/polaris-arrowos11-docker-support-kernel/android_kernel_xiaomi_sm8250/
 
 echo "=== 步骤2: 清理 ==="
