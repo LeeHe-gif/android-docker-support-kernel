@@ -8,30 +8,33 @@ mkdir -p out
 
 echo "=== 步骤2: 设置环境 ==="
 export ARCH=arm64
-export CC=/opt/proton-clang-20210522/bin/clang
-export CROSS_COMPILE=aarch64-linux-gnu- \
-export CROSS_COMPILE_ARM32=arm-linux-gnueabi-
+export SUBARCH=arm64
 
-# 添加编译选项来忽略警告
-export KCFLAGS="
--Wformat
--Wno-format
--Wno-uninitialized
--Wno-unused-variable
--Wno-unused-but-set-variable
--Wno-maybe-uninitialized
--Wno-sign-compare -enable-trivial-auto-var-init-zero-knowing-it-will-be-removed-from-clang
-"
+# 使用 Proton Clang 工具链
+export CC=/opt/proton-clang-20210522/bin/clang
+export LD=/opt/proton-clang-20210522/bin/ld.lld
+export AR=/opt/proton-clang-20210522/bin/llvm-ar
+export CROSS_COMPILE=/opt/proton-clang-20210522/bin/aarch64-linux-gnu-
+export CROSS_COMPILE_ARM32=/opt/proton-clang-20210522/bin/arm-linux-gnueabi-
+
+# 修复 KCFLAGS - 不要使用多行，用单行
+export KCFLAGS="-Wno-format -Wno-uninitialized -Wno-unused-variable -Wno-unused-but-set-variable -Wno-maybe-uninitialized -Wno-sign-compare -Wno-pointer-sign"
 
 echo "=== 步骤3: 配置内核 ==="
-make O=out alioth_defconfig
+make O=out ARCH=arm64 alioth_defconfig
 
-echo "=== 步骤4: 开始编译（纯GCC）==="
-make -j$(nproc --all) O=out
+echo "=== 步骤4: 开始编译（使用 Proton Clang）==="
+make -j$(nproc --all) O=out \
+    ARCH=arm64 \
+    CC=/opt/proton-clang-20210522/bin/clang \
+    LD=/opt/proton-clang-20210522/bin/ld.lld \
+    CROSS_COMPILE=/opt/proton-clang-20210522/bin/aarch64-linux-gnu- \
+    CROSS_COMPILE_ARM32=/opt/proton-clang-20210522/bin/arm-linux-gnueabi- \
+    KCFLAGS="-Wno-pointer-sign -Wno-array-bounds"
 
-echo "=== 步骤4：检查编译结果 ==="
+echo "=== 步骤5：检查编译结果 ==="
 if [ -f "out/arch/arm64/boot/Image.gz-dtb" ]; then
-    echo "✅ Image.gz 编译成功"
+    echo "✅ 内核编译成功"
 else
     echo "❌ 内核编译失败 - Image.gz-dtb 未生成"
     exit 1
