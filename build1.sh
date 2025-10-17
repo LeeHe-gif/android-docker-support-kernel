@@ -40,7 +40,7 @@ export ARCH=arm64
 make O=out my_alioth_defconfig
 
 echo "=== 步骤4: 开始编译 ==="
-make -j$(nproc --all) O=out \
+printf '\1\N\Y' | make -j$(nproc --all) O=out \
     ARCH=arm64 \
     CC=~/proton-clang-20210522/bin/clang \
     AR=~/proton-clang-20210522/bin/llvm-ar \
@@ -51,8 +51,8 @@ make -j$(nproc --all) O=out \
     STRIP=~/proton-clang-20210522/bin/llvm-strip \
     CROSS_COMPILE=aarch64-linux-gnu- \
     CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
-    KCFLAGS="-Wformat -Wsometimes-uninitialized -Wformat-security -Wunknown-warning-option -Wunused-result -Wuninitialized -Wno-error -Wno-pointer-sign -enable-trivial-auto-var-init-zero-knowing-it-will-be-removed-from-clang" 
-    
+    KCFLAGS="-Wformat -Wsometimes-uninitialized -Wformat-security -Wunknown-warning-option -Wunused-result -Wuninitialized -Wno-error -Wno-pointer-sign -enable-trivial-auto-var-init-zero-knowing-it-will-be-removed-from-clang"     
+
 echo "=== 步骤5：检查编译结果 ==="
 if [ -f "out/arch/arm64/boot/Image.gz-dtb" ]; then
     echo "✅ 内核编译成功"
