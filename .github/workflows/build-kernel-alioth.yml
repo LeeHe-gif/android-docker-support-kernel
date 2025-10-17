@@ -38,8 +38,8 @@ jobs:
         
         # 进入 anykernel3 目录并创建刷机包
         cd android_kernel_xiaomi_sm8250/AnyKernel3/
-        zip -r alioth_dockerkernel.zip anykernel.sh Image.gz-dtb LICENSE META-INF modules patch tools README.md
-        
+        zip -r alioth_dockerkernel.zip *
+
         # 验证刷机包是否创建成功
         if [ -f "alioth_dockerkernel.zip" ]; then
           echo "✅ anykernel3 包创建成功"
