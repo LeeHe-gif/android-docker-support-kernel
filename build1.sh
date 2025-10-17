@@ -1,8 +1,4 @@
 #!/bin/bash
-echo "=== 步骤1: 设置proton-clang 13.0.0 ==="
-
-git clone https://github.com/kdrag0n/proton-clang.git proton-clang-20210522
-
 echo "=== 步骤2: 清理 ==="
 make clean
 make mrproper 
