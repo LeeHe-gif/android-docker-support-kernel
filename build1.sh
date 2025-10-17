@@ -1,12 +1,13 @@
 #!/bin/bash
 echo "=== 步骤1: 设置proton-clang 13.0.0 ==="
 git clone -b 12 --depth 1 https://github.com/kdrag0n/proton-clang.git
+
 echo "=== 步骤2: 清理 ==="
 make clean
 make mrproper 
 
 echo "=== 步骤3: 配置内核 ==="
-make O=out polaris_defconfig
+make O=out alioth_defconfig
 
 echo "=== 步骤4: 开始编译 ==="
 make -j$(nproc --all) O=out \
