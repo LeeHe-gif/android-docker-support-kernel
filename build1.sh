@@ -1,6 +1,20 @@
 #!/bin/bash
 echo "=== 步骤1: 设置proton-clang 13.0.0 ==="
-git clone -b master --depth 1 https://github.com/kdrag0n/proton-clang.git
+git clone --depth 1 https://github.com/kdrag0n/proton-clang.git
+export PATH="$(pwd)/proton-clang/bin:$PATH"
+# 验证编译器是否存在
+if [ ! -f "proton-clang/bin/clang" ]; then
+    echo "❌ 错误：clang编译器未找到"
+    echo "请检查proton-clang是否正确下载和解压"
+    exit 1
+fi
+
+# 验证编译器版本
+clang --version || {
+    echo "❌ 错误：clang无法执行"
+    exit 1
+}
+
 cd proton-clang/bin
 echo "-----------------"
 ls -l 
