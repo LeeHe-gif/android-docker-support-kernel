@@ -7,6 +7,7 @@ make clean
 make mrproper 
 
 echo "=== 步骤3: 配置内核 ==="
+export ARCH=arm64
 make O=out alioth_defconfig
 
 echo "=== 步骤4: 开始编译 ==="
