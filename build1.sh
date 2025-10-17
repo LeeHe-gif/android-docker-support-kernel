@@ -26,6 +26,7 @@ echo "=== 步骤4: 开始编译（使用 Proton Clang）==="
 make -j$(nproc --all) O=out \
     ARCH=arm64 \
     CC=/opt/proton-clang-20210522/bin/clang \
+    CLANG_TRIPLE=aarch64-linux-gnu- \
     LD=/opt/proton-clang-20210522/bin/ld.lld \
     CROSS_COMPILE=/opt/proton-clang-20210522/bin/aarch64-linux-gnu- \
     CROSS_COMPILE_ARM32=/opt/proton-clang-20210522/bin/arm-linux-gnueabi- \
