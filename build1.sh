@@ -1,6 +1,5 @@
 #!/bin/bash
-cd ~/android_kernel_xiaomi_sdm845
-echo "===步骤1: 设置编译器==="
+echo "===步骤1: 设置交叉编译器==="
 # 创建工具链目录
 sudo mkdir -p /opt
 sudo chmod 777 /opt
