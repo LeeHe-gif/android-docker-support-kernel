@@ -14,8 +14,6 @@ export SUBARCH=arm64
 export CC=/opt/proton-clang-20210522/bin/clang
 export LD=/opt/proton-clang-20210522/bin/ld.lld
 export AR=/opt/proton-clang-20210522/bin/llvm-ar
-export CROSS_COMPILE=/opt/proton-clang-20210522/bin/aarch64-linux-gnu-
-export CROSS_COMPILE_ARM32=/opt/proton-clang-20210522/bin/arm-linux-gnueabi-
 
 # 修复 KCFLAGS - 不要使用多行，用单行
 export KCFLAGS="-Wno-format -Wno-uninitialized -Wno-unused-variable -Wno-unused-but-set-variable -Wno-maybe-uninitialized -Wno-sign-compare -Wno-pointer-sign"
