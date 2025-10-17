@@ -9,7 +9,8 @@ mkdir -p out
 echo "=== 步骤2: 设置环境 ==="
 export ARCH=arm64
 export CC=/opt/proton-clang-20210522/bin/clang
-export CLANG_TRIPLE=aarch64-linux-gnu-
+export CROSS_COMPILE=aarch64-linux-gnu- \
+export CROSS_COMPILE_ARM32=arm-linux-gnueabi-
 
 # 添加编译选项来忽略警告
 export KCFLAGS="
