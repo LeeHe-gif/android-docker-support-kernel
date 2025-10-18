@@ -78,7 +78,7 @@ jobs:
         with:
           name: kernel-build-artifacts
           path: |
-            android_kernel_xiaomi_sm8250/AnyKernel3/polaris_dockerkernel.zip
+            android_kernel_xiaomi_sm8250/AnyKernel3/alioth_dockerkernel.zip
             android_kernel_xiaomi_sm8250/kernel_boot_directory.zip
           retention-days: 30
 
