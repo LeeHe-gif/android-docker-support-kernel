@@ -1,4 +1,4 @@
-name: Build alioth Kernel and Create Release
+name: Build CrDoird-11.10 alioth Kernel and Create Release
 
 on:
   workflow_dispatch:
