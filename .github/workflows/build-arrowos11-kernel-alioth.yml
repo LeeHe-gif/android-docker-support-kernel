@@ -30,10 +30,10 @@ jobs:
                 
     - name: Build kernel with proton-clang-13.0
       run: |
-        cp build1.sh android_kernel_xiaomi_alioth/
+        cp build3.sh android_kernel_xiaomi_alioth/
         cd android_kernel_xiaomi_alioth
-        chmod 755 build1.sh
-        ./build1.sh
+        chmod 755 build3.sh
+        ./build3.sh
             
     - name: Create anykernel3 package
       run: |
