@@ -1,4 +1,4 @@
-name: Build arrowos11 alioth Kernel and Create Release
+name: Build arrowos12.1 alioth Kernel and Create Release
 
 on:
   workflow_dispatch:
