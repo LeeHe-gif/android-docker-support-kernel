@@ -36,7 +36,7 @@ export ARCH=arm64
 make O=out my_alioth_defconfig
 
 echo "=== 步骤3: 开始编译 ==="
-printf '\1\N\Y' | make -j$(nproc --all) O=out \
+make -j$(nproc --all) O=out \
     ARCH=arm64 \
     CC=~/proton-clang-20210522/bin/clang \
     AR=~/proton-clang-20210522/bin/llvm-ar \
