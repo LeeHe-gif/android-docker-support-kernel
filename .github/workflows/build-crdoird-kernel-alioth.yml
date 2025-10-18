@@ -4,8 +4,9 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-kernel:
+  build:
     runs-on: ubuntu-latest
+
     inputs:
       branch:
         description: "选择分支"
@@ -22,7 +23,6 @@ env:
   TZ: Asia/Shanghai
   
     steps:
-
     - name: Checkout repository
       uses: actions/checkout@v4
 
@@ -81,11 +81,10 @@ env:
         retention-days: 30
 
   release:
-    needs: build-kernel
+    needs: build
     runs-on: ubuntu-latest
     
     steps:
-
     - name: Download artifacts
        uses: actions/download-artifact@v4
        with:
