@@ -32,8 +32,9 @@ arm-linux-gnueabi-gcc -v
 cd ~/work/polaris-arrowos11-docker-support-kernel/polaris-arrowos11-docker-support-kernel/android_kernel_xiaomi_sm8250/
 
 echo "=== 步骤2: 配置内核 ==="
-export ARCH=arm64
-make O=out my_alioth_defconfig
+mkdir out
+
+cp arch/arm64/configs/my_alioth_defconfig out/.config
 
 echo "=== 步骤3: 开始编译 ==="
 make -j$(nproc --all) O=out \
