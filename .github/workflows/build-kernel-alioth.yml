@@ -69,11 +69,11 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         tag_name: "alioth-kernel-build"  # 添加固定的 tag 名称
-        name: "alioth Docker Kernel Build (GCC 4.9.0)"
+        name: "alioth Docker Kernel Build (proton-clang-13.0.0)"
         body: |
           # alioth Docker Kernel Build
           
-          使用 GCC 4.9.0 编译的红米k40 crdoird15 内核
+          使用 proton-clang-13.0.0 编译的红米k40 crdoird15 内核
           
           ## 包含文件：
           - `alioth_dockerkernel.zip` - AnyKernel3 刷机包
