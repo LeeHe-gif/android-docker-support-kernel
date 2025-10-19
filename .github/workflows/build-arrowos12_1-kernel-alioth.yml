@@ -41,6 +41,11 @@ jobs:
         sudo make install
         cd ..
         rm -rf Python-2.7.18*
+        echo "检查pytho2是否安装成功"
+        python --version
+        echo "-----------------------"
+        python2 --version
+        echo "-----------------------"
                 
     - name: Build kernel with proton-clang-13.0
       run: |
