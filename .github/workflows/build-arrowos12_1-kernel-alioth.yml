@@ -1,121 +1,137 @@
-name: Build arrowos12.1 alioth Kernel and Create Release
+name: Build CrDoird-11.10 alioth Kernel and Create Release
 
 on:
   workflow_dispatch:
+  
+env:
+  REPO_URL: https://github.com/LeeHe-gif/android_kernel_xiaomi_alioth
+  REPO_BRANCH: arrow-12.1
+  TZ: Asia/Shanghai
 
 jobs:
-  build-kernel:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Install basic dependencies
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install basic dependencies
       run: |
-        sudo apt-get update
-        sudo apt-get install -y \
-          curl build-essential \
-          libncurses-dev bison bc flex libssl-dev \
-          gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi \
-          libelf-dev rsync kmod git cpio wget zip \
-          unzip python3 python-is-python3 make xz-utils python3-pip ccache rsync
+          sudo apt-get update
+          sudo apt-get install -y \
+            curl build-essential \
+            libncurses-dev bison bc flex libssl-dev \
+            gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi \
+            libelf-dev rsync kmod git cpio wget zip \
+            unzip python3 python-is-python3 make xz-utils python3-pip ccache rsync
 
-    - name: Clone kernel source and setup KernelSU
-      run: |
-        git clone https://github.com/LeeHe-gif/android_kernel_xiaomi_alioth.git
-        git clone https://github.com/LeeHe-gif/AnyKernel3.git
-        cd AnyKernel3
-        rm -rf ramdisk anykernel.sh
-        wget https://github.com/LeeHe-gif/android_kernel_xiaomi_sm8250/raw/refs/heads/15.0-alioth/AnyKernel3/anykernel.sh
-
+      - name: Clone kernel source and setup KernelSU
+        run: |
+          git clone --depth 1 $REPO_URL -b $REPO_BRANCH
+          git clone https://github.com/LeeHe-gif/AnyKernel3.git
+          cd AnyKernel3
+          rm -rf ramdisk anykernel.sh
+          wget https://github.com/LeeHe-gif/android_kernel_xiaomi_sm8250/raw/refs/heads/15.0-alioth/AnyKernel3/anykernel.sh
   
-    - name: 安装Python 2.7
-      run: |
-        cd ~
-        wget -q https://www.python.org/ftp/python/2.7.18/Python-2.7.18.tgz
-        tar -xzf Python-2.7.18.tgz
-        cd Python-2.7.18
-        ./configure --enable-optimizations
-        make -j$(nproc)
-        sudo make install
-        cd ..
-        rm -rf Python-2.7.18*
-        echo "检查pytho2是否安装成功"
-        python --version
-        echo "-----------------------"
-        python2 --version
-        echo "-----------------------"
+      - name: 安装Python 2.7
+        run: |
+          cd ~
+          wget -q https://www.python.org/ftp/python/2.7.18/Python-2.7.18.tgz
+          tar -xzf Python-2.7.18.tgz
+          cd Python-2.7.18
+          ./configure --enable-optimizations
+          make -j$(nproc)
+          sudo make install
+          cd ..
+          rm -rf Python-2.7.18*
                 
-    - name: Build kernel with proton-clang-13.0
-      run: |
-        cp build3.sh android_kernel_xiaomi_alioth/
-        cd android_kernel_xiaomi_alioth
-        chmod 755 build3.sh
-        ./build3.sh
+       name: Build kernel with proton-clang-13.0
+        run: |
+          cp build3.sh android_kernel_xiaomi_alioth/
+          cd android_kernel_xiaomi_alioth
+          chmod 755 build3.sh
+          ./build3.sh
             
-    - name: Create anykernel3 package
-      run: |
-        # 复制内核镜像到 anykernel3 目录
-        cp android_kernel_xiaomi_alioth/out/arch/arm64/boot/Image.gz-dtb AnyKernel3/
+      - name: Create anykernel3 package
+        run: |
+          # 复制内核镜像到 anykernel3 目录
+          cp android_kernel_xiaomi_alioth/out/arch/arm64/boot/Image.gz-dtb AnyKernel3/
         
-        # 进入 anykernel3 目录并创建刷机包
-        cd AnyKernel3/
-        zip -r alioth_aw12-1-dockerkernel.zip anykernel.sh Image.gz-dtb LICENSE META-INF modules patch tools README.md
+          # 进入 anykernel3 目录并创建刷机包
+          cd AnyKernel3/
+          zip -r alioth_aw12-1-dockerkernel.zip anykernel.sh Image.gz-dtb LICENSE META-INF modules patch tools README.md
 
-        # 验证刷机包是否创建成功
-        if [ -f "alioth_aw12-1-dockerkernel.zip" ]; then
-          echo "✅ anykernel3 包创建成功"
-          ls -la alioth_aw12-1-dockerkernel.zip
-          echo "刷机包大小:"
-          du -h alioth_aw12-1-dockerkernel.zip
-        else
-          echo "❌ anykernel3 包创建失败"
-          exit 1
-        fi
+          # 验证刷机包是否创建成功
+          if [ -f "alioth_aw12-1-dockerkernel.zip" ]; then
+            echo "✅ anykernel3 包创建成功"
+            ls -la alioth_aw12-1-dockerkernel.zip
+            echo "刷机包大小:"
+            du -h alioth_aw12-1-dockerkernel.zip
+          else
+            echo "❌ anykernel3 包创建失败"
+            exit 1
+          fi
         
-    - name: Create out directory archive
-      run: |
-        cd android_kernel_xiaomi_alioth
-        zip -r kernel_boot_directory.zip out/arch/arm64/boot
+      - name: Create out directory archive
+        run: |
+          cd android_kernel_xiaomi_alioth
+          zip -r kernel_boot_directory.zip out/arch/arm64/boot
         
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: kernel-build-artifacts
-        path: |
-          AnyKernel3/alioth_aw12-1-dockerkernel.zip
-          android_kernel_xiaomi_alioth/kernel_boot_directory.zip
-        retention-days: 30
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: kernel-build-artifacts
+          path: |
+            AnyKernel3/alioth_aw12-1-dockerkernel.zip
+            android_kernel_xiaomi_alioth/kernel_boot_directory.zip
+          retention-days: 30
 
-    - name: Create Release
-      uses: softprops/action-gh-release@v1
-      with:
-        tag_name: "alioth-arrowos12.1 kernel-build"  # 添加固定的 tag 名称
-        name: "alioth Docker Kernel Build "
-        body: |
-          # alioth Docker Kernel Build
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: kernel-build-artifacts
+          path: ./artifact
+
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: "alioth-ArrowOS-12.1-kernel-build"  # 添加固定的 tag 名称
+          name: "alioth Docker Kernel Build (proton-clang-13.0.0)"
+          body: |
+            # alioth Docker Kernel Build
           
-          ## 包含文件：
-          - `alioth_aw12-1-dockerkernel.zip` - AnyKernel3 刷机包
-          - `kernel_boot_directory.zip` - 完整的编译输出目录
+            使用 proton-clang-13.0.0 编译的红米k40 ArrowOS 12.1 版本内核
+            分支：arrow-12.1
+            ## 包含文件：
+            - `alioth_aw12-1-dockerkernel.zip` - AnyKernel3 刷机包
+            - `kernel_boot_directory.zip` - 完整的编译输出目录
           
-          ## 特性：
-          - ✅ 完整 Docker 容器支持
-          - ✅ 基于 (arrowos 12.1)[https://github.com/LeeHe-gif/android_kernel_xiaomi_alioth] 内核源码
+            ## 特性：
+            - ✅ 完整 Docker 容器支持
+            - ✅ 基于 (ArrowOS 12.1)[https://github.com/LeeHe-gif/android_kernel_xiaomi_alioth]内核源码
+            
+            ## 刷机说明
+            1. 下载 `alioth_aw12-1-dockerkernel.zip`
+            2. 通过 TWRP Recovery 刷入
+            3. 刷入 Magisk（❗目前刷入面具卡会第一屏）
+            3. 重启设备
+            4. 安装 Magisk 应用管理 root 权限
           
-          ## 刷机说明：
-          1. 下载 `alioth_aw12-1-dockerkernel.zip`
-          2. 通过 TWRP Recovery 刷入
-          3. 刷入magsik
-          3. 重启设备
-          4. 安装 Magisk 应用管理 root 权限
-          
-          **注意：** 刷机前请备份重要数据。
-        draft: false
-        prerelease: false
-        files: |
-          AnyKernel3/alioth_aw12-1-dockerkernel.zip
-          android_kernel_xiaomi_alioth/kernel_boot_directory.zip
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            **注意：** 刷机前请备份重要数据。
+          draft: false
+          prerelease: false
+          files: |
+            ./artifact/alioth_aw12-1-dockerkernel.zip
+            ./artifact/kernel_boot_directory.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
