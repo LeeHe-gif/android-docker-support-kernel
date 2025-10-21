@@ -68,7 +68,7 @@ sh check-config.sh
 ### 刷机步骤
 
 1. **下载文件**
-   - 从 Releases 页面下载最新的 `polaris_dockerkernel.zip`
+   - 从 Releases 页面下载对应设备最新的 `XXX_dockerkernel.zip`
 
 2. **进入 TWRP**
 
