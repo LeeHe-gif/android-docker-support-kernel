@@ -1,12 +1,12 @@
 # android Docker Kernel
 
 基于原生安卓编译完整支持 Docker 容器运行环境的内核。
-
+重新编译termux的docker，去掉termux依赖通过magisk模块集中在系统里
 ## ✨ 已编译内核
 
-- **基于 (Arrow OS 11)[https://github.com/LeeHe-gif/android_kernel_xiaomi_sdm845] ** 内核源码构建 polaris（MI Mix2s）已测试（重新编译termux的docker，去掉termux依赖通过magisk模块集中在系统里），除桥接网络与macvlan有问题之外，其他正常工作。
-- **基于 (CRDoird 11.1)[https://github.com/LeeHe-gif/android_kernel_xiaomi_sm8250.git]** 内核源码构建 alioth（Redmi k40）测试目前刷面具卡米，加ksu卡米。
-- **基于 (Arrow OS 12.1)[https://github.com/LeeHe-gif/android_kernel_xiaomi_alioth]** 内核源码构建 alioth（Redmi k40） 目前还在测试中
+- **基于 [Arrow OS 11](https://github.com/LeeHe-gif/android_kernel_xiaomi_sdm845) ** 内核源码构建 polaris（MI Mix2s）已测试除桥接网络与macvlan有问题之外，其他正常工作。
+- **基于 [CRDoird 11.1](https://github.com/LeeHe-gif/android_kernel_xiaomi_sm8250)** 内核源码构建 alioth（Redmi k40）测试目前刷面具卡米，加ksu卡米。
+- **基于 [Arrow OS 12.1](https://github.com/LeeHe-gif/android_kernel_xiaomi_alioth)** 内核源码构建 alioth（Redmi k40） 目前还在测试中
 
 ## ✅ Docker 支持状态
 
