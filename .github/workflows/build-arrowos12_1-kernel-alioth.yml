@@ -20,7 +20,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install basic dependencies
-      run: |
+        run: |
           sudo apt-get update
           sudo apt-get install -y \
             curl build-essential \
@@ -49,10 +49,10 @@ jobs:
           cd ..
           rm -rf Python-2.7.18*
                 
-       name: Build kernel with proton-clang-13.0
+      - name: Build kernel with proton-clang-13.0
         run: |
           cp build3.sh android_kernel_xiaomi_alioth/
-          cd android_kernel_xiaomi_alioth
+           cd android_kernel_xiaomi_alioth
           chmod 755 build3.sh
           ./build3.sh
             
