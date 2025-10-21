@@ -1,13 +1,12 @@
-# Polaris Docker Kernel for Xiaomi MIX 2S
+# android Docker Kernel
 
-专为小米 MIX 2S (polaris) 重新编译的完整支持 Docker 容器运行环境的内核。
+基于原生安卓编译完整支持 Docker 容器运行环境的内核。
 
-## ✨ 特性
+## ✨ 已编译内核
 
-- **基于 Arrow OS 11** 内核源码构建
-- **完整 Docker 支持** - 满足所有必要的内核配置要求
-- **AnyKernel3 封装** - 支持大多数自定义 Recovery 刷入
-- **Magisk 兼容** - 完美支持 root 权限管理
+- **基于 (Arrow OS 11)[https://github.com/LeeHe-gif/android_kernel_xiaomi_sdm845] ** 内核源码构建 polaris（MI Mix2s）已测试（重新编译termux的docker，去掉termux依赖通过magisk模块集中在系统里），除桥接网络与macvlan有问题之外，其他正常工作。
+- **基于 (CRDoird 11.1)[https://github.com/LeeHe-gif/android_kernel_xiaomi_sm8250.git]** 内核源码构建 alioth（Redmi k40）测试目前刷面具卡米，加ksu卡米。
+- **基于 (Arrow OS 12.1)[https://github.com/LeeHe-gif/android_kernel_xiaomi_alioth]** 内核源码构建 alioth（Redmi k40） 目前还在测试中
 
 ## ✅ Docker 支持状态
 
@@ -76,3 +75,5 @@ sh check-config.sh
 3. **刷入polaris_dockerkernel.zip**
 
 4. **刷入magisk**
+
+5.**重启**
