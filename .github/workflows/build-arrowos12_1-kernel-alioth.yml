@@ -1,4 +1,4 @@
-name: Build CrDoird-11.10 alioth Kernel and Create Release
+name: Build ArrowOS12.1 alioth Kernel and Create Release
 
 on:
   workflow_dispatch:
