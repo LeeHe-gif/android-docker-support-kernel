@@ -3,7 +3,7 @@
 # 步骤1: 设置 clang 14.0.2
 echo "=== 步骤1: 设置 clang 14.0.2  ==="
 if [ ! -d "/home/runner/prebuilts_clang_host_linux-x86_clang-r445002" ]; then
-    git clone https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86 --depth=1 /home/runner/prebuilts_clang_host_linux-x86_clang-r445002
+    git clone https://github.com/AOSP-12/prebuilts_clang_host_linux-x86_clang-r445002 --depth=1 /home/runner/prebuilts_clang_host_linux-x86_clang-r445002
 fi
 
 # -- 新增：定义工具链的绝对路径 --
