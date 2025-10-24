@@ -16,9 +16,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
       - name: Install basic dependencies
         run: |
           sudo apt-get update
@@ -29,6 +26,44 @@ jobs:
             libelf-dev rsync kmod git cpio wget zip \
             unzip python3 python-is-python3 make xz-utils python3-pip ccache rsync
 
+      - name: Cache Python 2.7
+        uses: actions/cache@v4
+        id: cache-python27
+        with:
+          path: |
+            /usr/local/bin/python2.7
+            /usr/local/lib/python2.7
+            /usr/local/include/python2.7
+          key: python-2.7.18-${{ runner.os }}-${{ hashFiles('**/cache-python-version') }}
+          restore-keys: |
+            python-2.7.18-${{ runner.os }}-
+
+      - name: Create cache version file
+        run: |
+          echo "python-2.7.18-$(date +%Y%m%d)" > cache-python-version
+
+      - name: Build and Install Python 2.7 (if cache miss)
+        if: steps.cache-python27.outputs.cache-hit != 'true'
+        run: |
+          cd ~
+          wget -q https://www.python.org/ftp/python/2.7.18/Python-2.7.18.tgz
+          tar -xzf Python-2.7.18.tgz
+          cd Python-2.7.18
+          ./configure --enable-optimizations --prefix=/usr/local
+          make -j$(nproc)
+          sudo make install
+          cd ..
+          rm -rf Python-2.7.18*
+          # 创建符号链接
+          sudo ln -sf /usr/local/bin/python2.7 /usr/local/bin/python2
+
+      - name: Verify Python 2.7 installation
+        run: |
+          which python2.7
+          python2.7 --version
+          which python2
+          python2 --version
+
       - name: Clone kernel source and setup KernelSU
         run: |
           git clone --depth 1 $REPO_URL -b $REPO_BRANCH
@@ -37,18 +72,6 @@ jobs:
           rm -rf ramdisk anykernel.sh
           wget https://github.com/LeeHe-gif/android_kernel_xiaomi_sm8250/raw/refs/heads/15.0-alioth/AnyKernel3/anykernel.sh
   
-      - name: 安装Python 2.7
-        run: |
-          cd ~
-          wget -q https://www.python.org/ftp/python/2.7.18/Python-2.7.18.tgz
-          tar -xzf Python-2.7.18.tgz
-          cd Python-2.7.18
-          ./configure --enable-optimizations
-          make -j$(nproc)
-          sudo make install
-          cd ..
-          rm -rf Python-2.7.18*
-                
       - name: Build kernel with clang 14.0.2(clang-r445002)
         run: |
           cp build3.sh android_kernel_xiaomi_alioth/
@@ -58,13 +81,9 @@ jobs:
             
       - name: Create anykernel3 package
         run: |
-          # 复制内核镜像到 anykernel3 目录
           cp android_kernel_xiaomi_alioth/out/arch/arm64/boot/Image.gz-dtb AnyKernel3/
-
           cd AnyKernel3/
           zip -r alioth_aw12-1-dockerkernel.zip anykernel.sh Image.gz-dtb LICENSE META-INF tools
-
-          # 验证刷机包是否创建成功
           if [ -f "alioth_aw12-1-dockerkernel.zip" ]; then
             echo "✅ anykernel3 包创建成功"
             ls -la alioth_aw12-1-dockerkernel.zip
