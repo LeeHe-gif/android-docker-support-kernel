@@ -34,8 +34,17 @@ arm-linux-gnueabi-gcc -v
 echo "================检查环境结束================"
 
 echo "=== 步骤2: 配置内核 ==="
-mkdir out
-cp arch/arm64/configs/my_alioth_defconfig out/.config
+make O=out ARCH=arm64 my_alioth_defconfig \
+    ARCH=arm64 \
+    CC=~/prebuilts_clang_host_linux-x86_clang-r445002/bin/clang \
+    AR=~/prebuilts_clang_host_linux-x86_clang-r445002/bin/llvm-ar \
+    NM=~/prebuilts_clang_host_linux-x86_clang-r445002/bin/llvm-nm \
+    LD=~/prebuilts_clang_host_linux-x86_clang-r445002/bin/ld.lld \
+    OBJCOPY=~/prebuilts_clang_host_linux-x86_clang-r445002/bin/llvm-objcopy \
+    OBJDUMP=~/prebuilts_clang_host_linux-x86_clang-r445002/bin/llvm-objdump \
+    STRIP=~/prebuilts_clang_host_linux-x86_clang-r445002/bin/llvm-strip \
+    CROSS_COMPILE=aarch64-linux-gnu- \
+    CROSS_COMPILE_ARM32=arm-linux-gnueabi-
 
 echo "=== 步骤3: 开始编译 ==="
 make -j$(nproc --all) O=out \
