@@ -40,7 +40,7 @@ echo "================检查环境结束================"
 echo "=== 步骤2: 配置内核 ==="
 mkdir out
 cp arch/arm64/configs/my_alioth_defconfig out/.config
-la out/
+ls -a out/
 # 步骤3: 开始编译
 echo "=== 步骤3: 开始编译 ==="
 # -- 修改：在 make 命令中使用工具的绝对路径 --
