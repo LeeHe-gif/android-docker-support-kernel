@@ -1,4 +1,4 @@
-name: Build CrDoird-11.10 alioth Kernel and Create Release
+name: Build CrDoird11.10 alioth Kernel and Create Release
 
 on:
   workflow_dispatch:
@@ -55,14 +55,14 @@ jobs:
           cp android_kernel_xiaomi_sm8250/out/arch/arm64/boot/Image.gz-dtb android_kernel_xiaomi_sm8250/AnyKernel3/
           # 进入 anykernel3 目录并创建刷机包
           cd android_kernel_xiaomi_sm8250/AnyKernel3/
-          zip -r alioth_dockerkernel.zip *
+          zip -r crdoird-alioth_dockerkernel.zip *
 
           # 验证刷机包是否创建成功
-          if [ -f "alioth_dockerkernel.zip" ]; then
+          if [ -f "crdoird-alioth_dockerkernel.zip" ]; then
             echo "✅ anykernel3 包创建成功"
-            ls -la alioth_dockerkernel.zip
+            ls -la crdoird-alioth_dockerkernel.zip
             echo "刷机包大小:"
-            du -h alioth_dockerkernel.zip
+            du -h crdoird-alioth_dockerkernel.zip
           else
             echo "❌ anykernel3 包创建失败"
             exit 1
@@ -78,7 +78,7 @@ jobs:
         with:
           name: kernel-build-artifacts
           path: |
-            android_kernel_xiaomi_sm8250/AnyKernel3/alioth_dockerkernel.zip
+            android_kernel_xiaomi_sm8250/AnyKernel3/crdoird-alioth_dockerkernel.zip
             android_kernel_xiaomi_sm8250/kernel_boot_directory.zip
           retention-days: 30
 
@@ -97,23 +97,22 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: "alioth-kernel-build"  # 添加固定的 tag 名称
-          name: "alioth Docker Kernel Build (proton-clang-13.0.0)"
+          tag_name: "alioth-kernel-build"
+          name: "alioth Docker Kernel Build (clang 14.0.2)"
           body: |
             # alioth Docker Kernel Build
           
-            使用 proton-clang-13.0.0 编译的红米k40 CrDoird-11.10版本内核
-            分支：$REPO_URL
+            红米k40 CrDoird-11.10 版本内核
             ## 包含文件：
-            - `alioth_dockerkernel.zip` - AnyKernel3 刷机包
+            - `crdoird-crdoird-alioth_dockerkernel.zip` - AnyKernel3 刷机包
             - `kernel_boot_directory.zip` - 完整的编译输出目录
           
             ## 特性：
-            - ✅ 完整 Docker 容器支持
+            - ✅ 接近完整的 Docker 容器支持
             - ✅ 基于 (CRDoird 15)[https://github.com/LeeHe-gif/android_kernel_xiaomi_sm8250/tree/15.0-alioth]内核源码
             
             ## 刷机说明（15.0-alioth-ksu分支使用ksu，15.0-alioth分支没有ksu）：
-            1. 下载 `alioth_dockerkernel.zip`
+            1. 下载 `crdoird-alioth_dockerkernel.zip`
             2. 通过 TWRP Recovery 刷入
             3. 刷入 Magisk（❗目前刷入面具卡会第一屏）
             3. 重启设备
@@ -123,7 +122,7 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            ./artifact/alioth_dockerkernel.zip
+            ./artifact/crdoird-alioth_dockerkernel.zip
             ./artifact/kernel_boot_directory.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
