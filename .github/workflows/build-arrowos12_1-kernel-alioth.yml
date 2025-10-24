@@ -49,10 +49,10 @@ jobs:
           cd ..
           rm -rf Python-2.7.18*
                 
-      - name: Build kernel with proton-clang-13.0
+      - name: Build kernel with clang 14.0.2(clang-r445002)
         run: |
           cp build3.sh android_kernel_xiaomi_alioth/
-           cd android_kernel_xiaomi_alioth
+          cd android_kernel_xiaomi_alioth
           chmod 755 build3.sh
           ./build3.sh
             
@@ -60,8 +60,7 @@ jobs:
         run: |
           # 复制内核镜像到 anykernel3 目录
           cp android_kernel_xiaomi_alioth/out/arch/arm64/boot/Image.gz-dtb AnyKernel3/
-        
-          # 进入 anykernel3 目录并创建刷机包
+
           cd AnyKernel3/
           zip -r alioth_aw12-1-dockerkernel.zip anykernel.sh Image.gz-dtb LICENSE META-INF modules patch tools README.md
 
