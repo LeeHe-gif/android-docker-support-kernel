@@ -35,7 +35,7 @@ arm-linux-gnueabi-gcc -v
 echo "====================检查环境结束==================="
 
 echo "=== 步骤2: 配置内核 ==="
-cd /home/runner/work/android-docker-support-kernel/android-docker-support-kernel/android_kernel_xiaomi_alioth
+cd /home/runner/work/android-docker-support-kernel/android-docker-support-kernel/android_kernel_xiaomi_sm8250
 mkdir out
 cp arch/arm64/configs/my_alioth_defconfig out/.config
 
