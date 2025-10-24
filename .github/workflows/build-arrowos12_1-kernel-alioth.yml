@@ -62,7 +62,7 @@ jobs:
           cp android_kernel_xiaomi_alioth/out/arch/arm64/boot/Image.gz-dtb AnyKernel3/
 
           cd AnyKernel3/
-          zip -r alioth_aw12-1-dockerkernel.zip anykernel.sh Image.gz-dtb LICENSE META-INF modules patch tools README.md
+          zip -r alioth_aw12-1-dockerkernel.zip anykernel.sh Image.gz-dtb LICENSE META-INF tools
 
           # 验证刷机包是否创建成功
           if [ -f "alioth_aw12-1-dockerkernel.zip" ]; then
@@ -104,12 +104,12 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: "alioth-ArrowOS-12.1-kernel-build"  # 添加固定的 tag 名称
+          tag_name: "alioth-ArrowOS-12.1-kernel-build"
           name: "alioth Docker Kernel Build (proton-clang-13.0.0)"
           body: |
             # alioth Docker Kernel Build
           
-            使用 proton-clang-13.0.0 编译的红米k40 ArrowOS 12.1 版本内核
+            红米k40 ArrowOS 12.1 版本内核
             分支：arrow-12.1
             ## 包含文件：
             - `alioth_aw12-1-dockerkernel.zip` - AnyKernel3 刷机包
