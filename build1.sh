@@ -1,30 +1,28 @@
 #!/bin/bash
 echo "=== 步骤1: 设置proton-clang 13.0.0 ==="
 cd ~
-wget -q https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/main/clang-r536225.tar.gz
-mkdir clang-r536225
-tar -xf clang-r536225.tar.gz -C clang-r536225
+git clone --depth 1 https://github.com/kdrag0n/proton-clang.git proton-clang-20210522
 
 echo "=======检查cc：======="
-~/clang-r536225/bin/clang -v
+~/proton-clang-20210522/bin/clang -v
 
 echo "=======检查ar：======="
-~/clang-r536225/bin/llvm-ar --version
+~/proton-clang-20210522/bin/llvm-ar --version
 
 echo "=======检查nm：======="
-~/clang-r536225/bin/llvm-nm --version
+~/proton-clang-20210522/bin/llvm-nm --version
 
 echo "=======检查ld：======="
-~/clang-r536225/bin/ld.lld -v
+~/proton-clang-20210522/bin/ld.lld -v
 
 echo "=======查objcopy：======="
-~/clang-r536225/bin/llvm-objcopy --version
+~/proton-clang-20210522/bin/llvm-objcopy --version
 
 echo "=======检查objdump：======="
-~/clang-r536225/bin/llvm-objdump --version
+~/proton-clang-20210522/bin/llvm-objdump --version
 
 echo "=======检查strip：======="
-~/clang-r536225/bin/llvm-strip --version
+~/proton-clang-20210522/bin/llvm-strip --version
 
 echo "=======检查aarch64-linux-gnu-gcc：======="
 aarch64-linux-gnu-gcc -v
@@ -42,13 +40,13 @@ cp arch/arm64/configs/my_alioth_defconfig out/.config
 echo "=== 步骤3: 开始编译 ==="
 make -j$(nproc --all) O=out \
     ARCH=arm64 \
-    CC=~/clang-r536225/bin/clang \
-    AR=~/clang-r536225/bin/llvm-ar \
-    NM=~/clang-r536225/bin/llvm-nm \
-    LD=~/clang-r536225/bin/ld.lld \
-    OBJCOPY=~/clang-r536225/bin/llvm-objcopy \
-    OBJDUMP=~/clang-r536225/bin/llvm-objdump \
-    STRIP=~/clang-r536225/bin/llvm-strip \
+    CC=~/proton-clang-20210522/bin/clang \
+    AR=~/proton-clang-20210522/bin/llvm-ar \
+    NM=~/proton-clang-20210522/bin/llvm-nm \
+    LD=~/proton-clang-20210522/bin/ld.lld \
+    OBJCOPY=~/proton-clang-20210522/bin/llvm-objcopy \
+    OBJDUMP=~/proton-clang-20210522/bin/llvm-objdump \
+    STRIP=~/proton-clang-20210522/bin/llvm-strip \
     CROSS_COMPILE=aarch64-linux-gnu- \
     CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
     KCFLAGS="-Wno-array-bounds -Wformat -Wsometimes-uninitialized -Wformat-security -Wunknown-warning-option -Wunused-result -Wuninitialized -Wno-error -Wno-pointer-sign"
