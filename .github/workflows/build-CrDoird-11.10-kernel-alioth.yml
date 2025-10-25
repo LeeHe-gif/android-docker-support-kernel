@@ -44,10 +44,10 @@ jobs:
                 
       - name: Build kernel with proton-clang-13.0
         run: |
-          cp build1.sh android_kernel_xiaomi_sm8250/
+          cp build2.sh android_kernel_xiaomi_sm8250/
           cd android_kernel_xiaomi_sm8250
-          chmod 755 build1.sh
-          ./build1.sh
+          chmod 755 build2.sh
+          ./build2.sh
             
       - name: Create anykernel3 package
         run: |
