@@ -83,12 +83,12 @@ jobs:
         run: |
           cp android_kernel_xiaomi_alioth/out/arch/arm64/boot/Image.gz-dtb AnyKernel3/
           cd AnyKernel3/
-          zip -r alioth_aw12-1-dockerkernel.zip anykernel.sh Image.gz-dtb LICENSE META-INF tools
-          if [ -f "alioth_aw12-1-dockerkernel.zip" ]; then
+          zip -r alioth_aw12.1-dockerkernel.zip anykernel.sh Image.gz-dtb LICENSE META-INF tools
+          if [ -f "alioth_aw12.1-dockerkernel.zip" ]; then
             echo "✅ anykernel3 包创建成功"
-            ls -la alioth_aw12-1-dockerkernel.zip
+            ls -la alioth_aw12.1-dockerkernel.zip
             echo "刷机包大小:"
-            du -h alioth_aw12-1-dockerkernel.zip
+            du -h alioth_aw12.1-dockerkernel.zip
           else
             echo "❌ anykernel3 包创建失败"
             exit 1
@@ -102,9 +102,9 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: kernel-build-artifacts
+          name: arrowos-kernel-build-artifacts
           path: |
-            AnyKernel3/alioth_aw12-1-dockerkernel.zip
+            AnyKernel3/alioth_aw12.1-dockerkernel.zip
             android_kernel_xiaomi_alioth/kernel_boot_directory.zip
           retention-days: 30
 
@@ -116,7 +116,7 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          name: kernel-build-artifacts
+          name: arrowos-kernel-build-artifacts
           path: ./artifact
 
 
@@ -131,7 +131,7 @@ jobs:
             红米k40 ArrowOS 12.1 版本内核
             分支：arrow-12.1
             ## 包含文件：
-            - `alioth_aw12-1-dockerkernel.zip` - AnyKernel3 刷机包
+            - `alioth_aw12.1-dockerkernel.zip` - AnyKernel3 刷机包
             - `kernel_boot_directory.zip` - 完整的编译输出目录
           
             ## 特性：
@@ -139,7 +139,7 @@ jobs:
             - ✅ 基于 (ArrowOS 12.1)[https://github.com/LeeHe-gif/android_kernel_xiaomi_alioth]内核源码
             
             ## 刷机说明
-            1. 下载 `alioth_aw12-1-dockerkernel.zip`
+            1. 下载 `alioth_aw12.1-dockerkernel.zip`
             2. 通过 TWRP Recovery 刷入
             3. 刷入 Magisk（❗目前刷入面具卡会第一屏）
             3. 重启设备
@@ -149,7 +149,7 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            ./artifact/alioth_aw12-1-dockerkernel.zip
+            ./artifact/alioth_aw12.1-dockerkernel.zip
             ./artifact/kernel_boot_directory.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
