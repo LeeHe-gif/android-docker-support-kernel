@@ -6,7 +6,7 @@
 
 - **基于 [Arrow OS 11](https://github.com/LeeHe-gif/android_kernel_xiaomi_sdm845)** 内核源码构建 polaris（MI Mix2s）已测试除桥接网络与macvlan有问题之外，其他正常工作。
 - **基于 [CRDoird 11.1](https://github.com/LeeHe-gif/android_kernel_xiaomi_sm8250)** 内核源码构建 alioth（Redmi k40）测试目前刷面具卡米，加ksu卡米。
-- **基于 [Arrow OS 12.1](https://github.com/LeeHe-gif/android_kernel_xiaomi_alioth)** 内核源码构建 alioth（Redmi k40） 目前还在测试中
+- **基于 [Arrow OS 12.1](https://github.com/LeeHe-gif/android_kernel_xiaomi_alioth)** 内核源码构建 alioth（Redmi k40）可以开机，刷面具不会卡米。
 
 ## ✅ Docker 支持状态
 
