@@ -186,7 +186,7 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            ./artifacts/alioth_arrowos12.1-dockerkernel.zip
-            ./artifacts/kernel_boot_directory.zip
+            ./artifacts/AnyKernel3/alioth_arrowos12.1-dockerkernel.zip
+            ./artifacts/kernel_source/kernel_boot_directory.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
