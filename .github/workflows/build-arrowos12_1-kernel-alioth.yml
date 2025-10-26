@@ -26,47 +26,30 @@ jobs:
             libelf-dev rsync kmod git cpio wget zip \
             unzip python3 python-is-python3 make xz-utils python3-pip ccache rsync
 
-      - name: Cache Python 2.7
-        uses: actions/cache@v4
-        id: cache-python27
-        with:
-          path: |
-            /usr/local/bin/python2.7
-            /usr/local/lib/python2.7
-            /usr/local/include/python2.7
-          key: python-2.7.18-${{ runner.os }}-${{ hashFiles('**/cache-python-version') }}
-          restore-keys: |
-            python-2.7.18-${{ runner.os }}-
-
-      - name: Create cache version file
+      - name: Setup Python 2.7
         run: |
-          echo "python-2.7.18-$(date +%Y%m%d)" > cache-python-version
-
-      - name: Build and Install Python 2.7 (if cache miss)
-        if: steps.cache-python27.outputs.cache-hit != 'true'
-        run: |
-          cd ~
-          wget -q https://www.python.org/ftp/python/2.7.18/Python-2.7.18.tgz
-          tar -xzf Python-2.7.18.tgz
-          cd Python-2.7.18
-          ./configure --enable-optimizations --prefix=/usr/local
-          make -j$(nproc)
-          sudo make install
-          cd ..
-          rm -rf Python-2.7.18*
+          # 检查是否已安装 Python 2.7
+          if ! command -v python2.7 &> /dev/null; then
+            echo "Installing Python 2.7..."
+            cd ~
+            wget -q https://www.python.org/ftp/python/2.7.18/Python-2.7.18.tgz
+            tar -xzf Python-2.7.18.tgz
+            cd Python-2.7.18
+            ./configure --enable-optimizations --prefix=/usr/local
+            make -j$(nproc)
+            sudo make install
+            cd ..
+            rm -rf Python-2.7.18*
+          else
+            echo "Python 2.7 already installed"
+          fi
           # 创建符号链接
-          sudo ln -sf /usr/local/bin/python2.7 /usr/local/bin/python2
-
-      - name: Verify Python 2.7 installation
-        run: |
-          which python2.7
+          sudo ln -sf /usr/local/bin/python2.7 /usr/local/bin/python2 || true
           python2.7 --version
-          which python2
-          python2 --version
 
       - name: Clone kernel source and setup KernelSU
         run: |
-          git clone --depth 1 $REPO_URL -b $REPO_BRANCH
+          git clone --depth 1 $REPO_URL -b $REPO_BRANCH kernel_source
           git clone https://github.com/LeeHe-gif/AnyKernel3.git
           cd AnyKernel3
           rm -rf ramdisk anykernel.sh
@@ -74,21 +57,21 @@ jobs:
   
       - name: Build kernel with clang 14.0.2(clang-r445002)
         run: |
-          cp build3.sh android_kernel_xiaomi_alioth/
-          cd android_kernel_xiaomi_alioth
+          cp build3.sh kernel_source/
+          cd kernel_source
           chmod 755 build3.sh
           ./build3.sh
             
       - name: Create anykernel3 package
         run: |
-          cp android_kernel_xiaomi_alioth/out/arch/arm64/boot/Image.gz-dtb AnyKernel3/
+          cp kernel_source/out/arch/arm64/boot/Image.gz-dtb AnyKernel3/
           cd AnyKernel3/
-          zip -r alioth_aw12.1-dockerkernel.zip anykernel.sh Image.gz-dtb LICENSE META-INF tools
-          if [ -f "alioth_aw12.1-dockerkernel.zip" ]; then
+          zip -r alioth_arrowos12.1-dockerkernel.zip anykernel.sh Image.gz-dtb LICENSE META-INF tools
+          if [ -f "alioth_arrowos12.1-dockerkernel.zip" ]; then
             echo "✅ anykernel3 包创建成功"
-            ls -la alioth_aw12.1-dockerkernel.zip
+            ls -la alioth_arrowos12.1-dockerkernel.zip
             echo "刷机包大小:"
-            du -h alioth_aw12.1-dockerkernel.zip
+            du -h alioth_arrowos12.1-dockerkernel.zip
           else
             echo "❌ anykernel3 包创建失败"
             exit 1
@@ -96,7 +79,7 @@ jobs:
         
       - name: Create out directory archive
         run: |
-          cd android_kernel_xiaomi_alioth
+          cd kernel_source
           zip -r kernel_boot_directory.zip out/arch/arm64/boot
         
       - name: Upload artifacts
@@ -104,52 +87,63 @@ jobs:
         with:
           name: arrowos-kernel-build-artifacts
           path: |
-            AnyKernel3/alioth_aw12.1-dockerkernel.zip
-            android_kernel_xiaomi_alioth/kernel_boot_directory.zip
+            AnyKernel3/alioth_arrowos12.1-dockerkernel.zip
+            kernel_source/kernel_boot_directory.zip
           retention-days: 30
 
   release:
     needs: build
     runs-on: ubuntu-latest
+    if: success()
 
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
           name: arrowos-kernel-build-artifacts
-          path: ./artifact
+          path: ./artifacts
 
+      - name: Verify artifacts exist
+        run: |
+          echo "检查下载的 artifacts:"
+          ls -la ./artifacts/
+          echo "文件详情:"
+          ls -la ./artifacts/*.zip || echo "没有找到zip文件"
+          # 检查文件是否存在
+          [ -f "./artifacts/alioth_arrowos12.1-dockerkernel.zip" ] && echo "✅ 刷机包存在" || echo "❌ 刷机包不存在"
+          [ -f "./artifacts/kernel_boot_directory.zip" ] && echo "✅ 内核目录包存在" || echo "❌ 内核目录包不存在"
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: "alioth-ArrowOS-12.1-kernel-build"
-          name: "alioth Docker Kernel Build (proton-clang-13.0.0)"
+          tag_name: "alioth-arrowos-12.1-kernel-$(date +%Y%m%d-%H%M%S)"
+          name: "alioth ArrowOS 12.1 Kernel Build"
           body: |
-            # alioth Docker Kernel Build
+            # alioth ArrowOS 12.1 Kernel Build
           
-            红米k40 ArrowOS 12.1 版本内核
+            红米 K40 ArrowOS 12.1 版本内核
             分支：arrow-12.1
             ## 包含文件：
-            - `alioth_aw12.1-dockerkernel.zip` - AnyKernel3 刷机包
+            - `alioth_arrowos12.1-dockerkernel.zip` - AnyKernel3 刷机包
             - `kernel_boot_directory.zip` - 完整的编译输出目录
           
             ## 特性：
             - ✅ 完整 Docker 容器支持
-            - ✅ 基于 (ArrowOS 12.1)[https://github.com/LeeHe-gif/android_kernel_xiaomi_alioth]内核源码
+            - ✅ 基于 [ArrowOS 12.1](https://github.com/LeeHe-gif/android_kernel_xiaomi_alioth) 内核源码
+            - ✅ 使用 clang 14.0.2 编译
             
             ## 刷机说明
-            1. 下载 `alioth_aw12.1-dockerkernel.zip`
+            1. 下载 `alioth_arrowos12.1-dockerkernel.zip`
             2. 通过 TWRP Recovery 刷入
-            3. 刷入 Magisk（❗目前刷入面具卡会第一屏）
             3. 重启设备
-            4. 安装 Magisk 应用管理 root 权限
           
-            **注意：** 刷机前请备份重要数据。
+            **注意：** 
+            - 刷机前请备份重要数据
+            - 如需 Magisk，请在刷入内核后单独刷入
           draft: false
           prerelease: false
           files: |
-            ./artifact/alioth_aw12.1-dockerkernel.zip
-            ./artifact/kernel_boot_directory.zip
+            ./artifacts/alioth_arrowos12.1-dockerkernel.zip
+            ./artifacts/kernel_boot_directory.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
