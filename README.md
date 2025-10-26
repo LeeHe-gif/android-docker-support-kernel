@@ -42,7 +42,6 @@
 
 ```Bash
 mkdir -p /sys/fs/cgroup
-mount -t tmpfs -o rw,nosuid,nodev,noexec,relatime cgroup_root /sys/fs/cgroup 2>/dev/null
 
 cgroups="blkio cpu cpuacct cpuset devices freezer memory pids"
 for cg in $cgroups; do
