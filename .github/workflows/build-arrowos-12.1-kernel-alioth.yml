@@ -146,20 +146,18 @@ jobs:
           name: arrowos-kernel-build-artifacts
           path: ./artifacts
 
-      - name: Verify artifacts exist
+      - name: List downloaded artifacts
         run: |
-          echo "检查下载的 artifacts:"
+          echo "当前目录结构:"
+          pwd
+          ls -la
+          echo "Artifacts 目录结构:"
           ls -la ./artifacts/
-          echo "文件详情:"
-          ls -la ./artifacts/*.zip || echo "没有找到zip文件"
-          # 检查文件是否存在
-          [ -f "./artifacts/alioth_arrowos12.1-dockerkernel.zip" ] && echo "✅ 刷机包存在" || echo "❌ 刷机包不存在"
-          [ -f "./artifacts/kernel_boot_directory.zip" ] && echo "✅ 内核目录包存在" || echo "❌ 内核目录包不存在"
-
+          
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: "alioth-arrowos-12.1-kernel-$(date +%Y%m%d-%H%M%S)"
+          tag_name: "alioth-arrowos-12.1-kernel-build"
           name: "alioth ArrowOS 12.1 Kernel Build"
           body: |
             # alioth ArrowOS 12.1 Kernel Build
