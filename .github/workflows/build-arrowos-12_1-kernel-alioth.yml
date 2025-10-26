@@ -26,26 +26,45 @@ jobs:
             libelf-dev rsync kmod git cpio wget zip \
             unzip python3 python-is-python3 make xz-utils python3-pip ccache rsync
 
-      - name: Setup Python 2.7
+      - name: Cache Python 2.7
+        uses: actions/cache@v4
+        id: cache-python27
+        with:
+          path: /usr/local/python-2.7.18
+          key: python-2.7.18-${{ runner.os }}-${{ hashFiles('.github/workflows/**') }}
+          restore-keys: |
+            python-2.7.18-${{ runner.os }}-
+
+      - name: Build and Install Python 2.7 (if cache miss)
+        if: steps.cache-python27.outputs.cache-hit != 'true'
         run: |
-          # 检查是否已安装 Python 2.7
-          if ! command -v python2.7 &> /dev/null; then
-            echo "Installing Python 2.7..."
-            cd ~
-            wget -q https://www.python.org/ftp/python/2.7.18/Python-2.7.18.tgz
-            tar -xzf Python-2.7.18.tgz
-            cd Python-2.7.18
-            ./configure --enable-optimizations --prefix=/usr/local
-            make -j$(nproc)
-            sudo make install
-            cd ..
-            rm -rf Python-2.7.18*
-          else
-            echo "Python 2.7 already installed"
-          fi
+          cd ~
+          wget -q https://www.python.org/ftp/python/2.7.18/Python-2.7.18.tgz
+          tar -xzf Python-2.7.18.tgz
+          cd Python-2.7.18
+          ./configure --enable-optimizations --prefix=/usr/local/python-2.7.18
+          make -j$(nproc)
+          sudo make install
+          cd ..
+          rm -rf Python-2.7.18*
           # 创建符号链接
-          sudo ln -sf /usr/local/bin/python2.7 /usr/local/bin/python2 || true
+          sudo ln -sf /usr/local/python-2.7.18/bin/python2.7 /usr/local/bin/python2.7
+          sudo ln -sf /usr/local/python-2.7.18/bin/python2.7 /usr/local/bin/python2
+
+      - name: Setup Python 2.7 (if cache hit)
+        if: steps.cache-python27.outputs.cache-hit == 'true'
+        run: |
+          echo "Using cached Python 2.7.18"
+          # 创建符号链接
+          sudo ln -sf /usr/local/python-2.7.18/bin/python2.7 /usr/local/bin/python2.7 || true
+          sudo ln -sf /usr/local/python-2.7.18/bin/python2.7 /usr/local/bin/python2 || true
           python2.7 --version
+
+      - name: Verify Python installation
+        run: |
+          echo "Python versions:"
+          which python2.7 && python2.7 --version || echo "python2.7 not found"
+          which python2 && python2 --version || echo "python2 not found"
 
       - name: Clone kernel source and setup KernelSU
         run: |
@@ -62,6 +81,12 @@ jobs:
           chmod 755 build3.sh
           ./build3.sh
             
+      - name: Verify build output
+        run: |
+          echo "检查构建输出:"
+          ls -la kernel_source/out/arch/arm64/boot/ || echo "构建输出目录不存在"
+          [ -f "kernel_source/out/arch/arm64/boot/Image.gz-dtb" ] && echo "✅ Image.gz-dtb 存在" || echo "❌ Image.gz-dtb 不存在"
+
       - name: Create anykernel3 package
         run: |
           cp kernel_source/out/arch/arm64/boot/Image.gz-dtb AnyKernel3/
