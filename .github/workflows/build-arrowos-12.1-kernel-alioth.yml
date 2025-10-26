@@ -26,45 +26,63 @@ jobs:
             libelf-dev rsync kmod git cpio wget zip \
             unzip python3 python-is-python3 make xz-utils python3-pip ccache rsync
 
+      - name: Check for existing Python 2.7
+        id: check-python
+        run: |
+          if command -v python2.7 &> /dev/null; then
+            echo "python_exists=true" >> $GITHUB_OUTPUT
+            echo "✅ Python 2.7 already installed in system"
+          else
+            echo "python_exists=false" >> $GITHUB_OUTPUT
+            echo "❌ Python 2.7 not found, will install"
+          fi
+
       - name: Cache Python 2.7
+        if: steps.check-python.outputs.python_exists == 'false'
         uses: actions/cache@v4
         id: cache-python27
         with:
-          path: /usr/local/python-2.7.18
-          key: python-2.7.18-${{ runner.os }}-${{ hashFiles('.github/workflows/**') }}
+          path: /tmp/python-2.7.18
+          key: python-2.7.18-${{ runner.os }}-v3
           restore-keys: |
             python-2.7.18-${{ runner.os }}-
 
-      - name: Build and Install Python 2.7 (if cache miss)
-        if: steps.cache-python27.outputs.cache-hit != 'true'
+      - name: Build and Install Python 2.7 (if not exists and cache miss)
+        if: steps.check-python.outputs.python_exists == 'false' && steps.cache-python27.outputs.cache-hit != 'true'
         run: |
-          cd ~
+          echo "Installing Python 2.7.18 from source..."
+          cd /tmp
           wget -q https://www.python.org/ftp/python/2.7.18/Python-2.7.18.tgz
           tar -xzf Python-2.7.18.tgz
           cd Python-2.7.18
-          ./configure --enable-optimizations --prefix=/usr/local/python-2.7.18
+          ./configure --enable-optimizations --prefix=/tmp/python-2.7.18
           make -j$(nproc)
-          sudo make install
+          make install
           cd ..
           rm -rf Python-2.7.18*
-          # 创建符号链接
-          sudo ln -sf /usr/local/python-2.7.18/bin/python2.7 /usr/local/bin/python2.7
-          sudo ln -sf /usr/local/python-2.7.18/bin/python2.7 /usr/local/bin/python2
 
-      - name: Setup Python 2.7 (if cache hit)
-        if: steps.cache-python27.outputs.cache-hit == 'true'
+      - name: Setup Python from cache
+        if: steps.check-python.outputs.python_exists == 'false' && steps.cache-python27.outputs.cache-hit == 'true'
         run: |
           echo "Using cached Python 2.7.18"
-          # 创建符号链接
-          sudo ln -sf /usr/local/python-2.7.18/bin/python2.7 /usr/local/bin/python2.7 || true
-          sudo ln -sf /usr/local/python-2.7.18/bin/python2.7 /usr/local/bin/python2 || true
-          python2.7 --version
 
-      - name: Verify Python installation
+      - name: Install Python to system (if built from source)
+        if: steps.check-python.outputs.python_exists == 'false' && steps.cache-python27.outputs.cache-hit != 'true'
         run: |
-          echo "Python versions:"
-          which python2.7 && python2.7 --version || echo "python2.7 not found"
-          which python2 && python2 --version || echo "python2 not found"
+          echo "Installing Python 2.7.18 to system..."
+          sudo cp -r /tmp/python-2.7.18/* /usr/local/
+          sudo ln -sf /usr/local/bin/python2.7 /usr/local/bin/python2
+
+      - name: Final Python verification
+        run: |
+          echo "Final Python verification:"
+          which python2.7 && python2.7 --version || echo "python2.7 not in PATH"
+          which python2 && python2 --version || echo "python2 not in PATH"
+          # 如果系统没有，使用我们安装的
+          if ! command -v python2.7 &> /dev/null; then
+            echo "Adding /usr/local/bin to PATH"
+            echo "/usr/local/bin" >> $GITHUB_PATH
+          fi
 
       - name: Clone kernel source and setup KernelSU
         run: |
