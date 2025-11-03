@@ -51,7 +51,7 @@ make -j$(nproc --all) O=out \
     STRIP=~/clang-r416183b/bin/llvm-strip \
     CROSS_COMPILE=aarch64-linux-gnu- \
     CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
-    KCFLAGS="-Wno-array-bounds -Wformat -Wsometimes-uninitialized -Wformat-security -Wunknown-warning-option -Wunused-result -Wuninitialized -Wno-error -Wno-pointer-sign"
+    KCFLAGS="-Wno-array-bounds -Wformat -Wsometimes-uninitialized -Wformat-extra-args -Wformat-security -Wunknown-warning-option -Wunused-result -Wuninitialized -Wno-error -Wno-pointer-sign"
     
 echo "=== 步骤4：检查编译结果 ==="
 if [ -f "out/arch/arm64/boot/Image.gz-dtb" ]; then
