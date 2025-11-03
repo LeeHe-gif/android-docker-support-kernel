@@ -40,7 +40,7 @@ mkdir out
 cp arch/arm64/configs/my_U30Air_defconfig out/.config
 
 echo "=== 步骤3: 开始编译 ==="
-make -j$(nproc --all) O=out \
+make -j4 O=out \
     ARCH=arm64 \
     CC=~/clang-r416183b/bin/clang \
     AR=~/clang-r416183b/bin/llvm-ar \
