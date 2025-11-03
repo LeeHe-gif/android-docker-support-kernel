@@ -44,23 +44,8 @@ jobs:
         run: |
           echo "检查构建输出:"
           ls -la kernel_source/out/arch/arm64/boot/ || echo "构建输出目录不存在"
-          [ -f "kernel_source/out/arch/arm64/boot/Image.gz-dtb" ] && echo "✅ Image.gz-dtb 存在" || echo "❌ Image.gz-dtb 不存在"
-
-      - name: Create anykernel3 package
-        run: |
-          cp kernel_source/out/arch/arm64/boot/Image.gz-dtb AnyKernel3/
-          cd AnyKernel3/
-          zip -r zte-u30air-dockerkernel.zip anykernel.sh Image.gz-dtb LICENSE META-INF tools
-          if [ -f "zte-u30air-dockerkernel.zip" ]; then
-            echo "✅ anykernel3 包创建成功"
-            ls -la zte-u30air-dockerkernel.zip
-            echo "刷机包大小:"
-            du -h zte-u30air-dockerkernel.zip
-          else
-            echo "❌ anykernel3 包创建失败"
-            exit 1
-          fi
-        
+          [ -f "kernel_source/out/arch/arm64/boot/Image.gz" ] && echo "✅ Image.gz 存在" || echo "❌ Image.gz 不存在"
+       
       - name: Create out directory archive
         run: |
           cd kernel_source
@@ -71,7 +56,6 @@ jobs:
         with:
           name: arrowos-kernel-build-artifacts
           path: |
-            AnyKernel3/zte-u30air-dockerkernel.zip
             kernel_source/kernel_boot_directory.zip
           retention-days: 30
 
@@ -104,26 +88,16 @@ jobs:
             # Kernel Build
           
             ## 包含文件：
-            - `zte-u30air-dockerkernel.zip` - AnyKernel3 刷机包
             - `kernel_boot_directory.zip` - 完整的编译输出目录
           
             ## 特性：
             - ✅ 完整 Docker 容器支持
             - ✅ 基于 [这个](https://github.com/Enceka/android_kernel_zte_ums9620_mifi_u30air.git) 内核源码
             - ✅ 使用 clang 12.1.0 编译
-            
-            ## 刷机说明
-            1. 下载 `zte-u30air-dockerkernel.zip`
-            2. 通过 TWRP Recovery 刷入
-            3. 重启设备
-          
-            **注意：** 
-            - 刷机前请备份重要数据
-            - 如需 Magisk，请在刷入内核后单独刷入
+
           draft: false
           prerelease: false
           files: |
-            ./artifacts/AnyKernel3/zte-u30air-dockerkernel.zip
             ./artifacts/kernel_source/kernel_boot_directory.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
