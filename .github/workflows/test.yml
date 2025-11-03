@@ -29,9 +29,6 @@ jobs:
       - name: Clone kernel source
         run: |
           git clone --depth 1 $REPO_URL -b $REPO_BRANCH kernel_source
-          git clone https://github.com/LeeHe-gif/AnyKernel3.git
-          cd AnyKernel3
-          rm -rf ramdisk 
   
       - name: Build kernel with clang 12.1.0 (clang-r416183b)
         run: |
