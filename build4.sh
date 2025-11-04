@@ -1,5 +1,5 @@
 #!/bin/bash
-echo "=== 步骤1: 设置 clang 19.0.1 ==="
+echo "=== 步骤1: 设置 clang 12.0.1 ==="
 cd ~
 wget -q https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/tags/android-12.1.0_r26/clang-r416183b.tar.gz
 mkdir clang-r416183b
