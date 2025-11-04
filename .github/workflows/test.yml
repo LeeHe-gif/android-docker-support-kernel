@@ -51,7 +51,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: arrowos-kernel-build-artifacts
+          name: u30air-kernel-build-artifacts
           path: |
             kernel_source/kernel_boot_directory.zip
           retention-days: 30
@@ -65,7 +65,7 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          name: arrowos-kernel-build-artifacts
+          name: u30air-kernel-build-artifacts
           path: ./artifacts
 
       - name: List downloaded artifacts
@@ -86,9 +86,7 @@ jobs:
           
             ## 包含文件：
             - `kernel_boot_directory.zip` - 完整的编译输出目录
-          
-            ## 特性：
-            - ✅ 完整 Docker 容器支持
+            ## 说明：
             - ✅ 基于 [这个](https://github.com/Enceka/android_kernel_zte_ums9620_mifi_u30air.git) 内核源码
             - ✅ 使用 clang 12.1.0 编译
 
