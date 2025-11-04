@@ -35,17 +35,9 @@ arm-linux-gnueabi-gcc -v
 echo "====================检查环境结束==================="
 
 echo "=== 步骤2: 配置内核 ==="
-make O=out ARCH=arm64 test_U30Air_defconfig \
-    ARCH=arm64 \
-    CC=~/clang-r416183b/bin/clang \
-    AR=~/clang-r416183b/bin/llvm-ar \
-    NM=~/clang-r416183b/bin/llvm-nm \
-    LD=~/clang-r416183b/bin/ld.lld \
-    OBJCOPY=~/clang-r416183b/bin/llvm-objcopy \
-    OBJDUMP=~/clang-r416183b/bin/llvm-objdump \
-    STRIP=~/clang-r416183b/bin/llvm-strip \
-    CROSS_COMPILE=aarch64-linux-gnu- \
-    CROSS_COMPILE_ARM32=arm-linux-gnueabi-
+cd /home/runner/work/android-docker-support-kernel/android-docker-support-kernel/kernel_source
+mkdir out
+cp arch/arm64/configs/test_U30Air_defconfig out/.config
 
 echo "=== 步骤3: 开始编译 ==="
 make -j$(nproc --all) O=out \
