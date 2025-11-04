@@ -36,13 +36,7 @@ jobs:
           cd kernel_source
           chmod 755 build4.sh
           ./build4.sh
-            
-      - name: Verify build output
-        run: |
-          echo "检查构建输出:"
-          ls -la kernel_source/out/arch/arm64/boot/ || echo "构建输出目录不存在"
-          [ -f "kernel_source/out/arch/arm64/boot/Image.gz" ] && echo "✅ Image.gz 存在" || echo "❌ Image.gz 不存在"
-       
+          
       - name: Create out directory archive
         run: |
           cd kernel_source
