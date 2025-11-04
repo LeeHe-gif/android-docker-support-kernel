@@ -40,7 +40,7 @@ mkdir out
 cp arch/arm64/configs/my_U30Air_defconfig out/.config
 
 echo "=== 步骤3: 开始编译 ==="
-make -j1 O=out \
+make -j$(nproc --all) O=out \
     ARCH=arm64 \
     CC=~/clang-r416183b/bin/clang \
     AR=~/clang-r416183b/bin/llvm-ar \
@@ -54,9 +54,9 @@ make -j1 O=out \
     KCFLAGS="-Wno-array-bounds -Wformat -Wsometimes-uninitialized -Wformat-extra-args -Wformat-security -Wunknown-warning-option -Wunused-result -Wuninitialized -Wno-error -Wno-pointer-sign"
     
 echo "=== 步骤4：检查编译结果 ==="
-if [ -f "out/arch/arm64/boot/Image.gz-dtb" ]; then
+if [ -f "out/arch/arm64/boot/Image.gz" ]; then
     echo "✅ 内核编译成功"
 else
-    echo "❌ 内核编译失败 - Image.gz-dtb 未生成"
+    echo "❌ 内核编译失败 - Image.gz 未生成"
     exit 1
 fi
