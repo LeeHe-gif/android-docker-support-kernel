@@ -1,41 +1,24 @@
 #!/bin/bash
 echo "=== 步骤1: 设置 clang 12.0.1 ==="
-cd ~
 wget -q https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/tags/android-12.1.0_r26/clang-r416183b.tar.gz
 mkdir clang-r416183b
 tar -xf clang-r416183b.tar.gz -C clang-r416183b
+mv clang-r416183b ~/clang-r416183b
+rm clang-r416183b.tar.gz
 
-echo "=======检查cc：======="
-~/clang-r416183b/bin/clang -v
-
-echo "=======检查ar：======="
-~/clang-r416183b/bin/llvm-ar --version
-
-echo "=======检查nm：======="
-~/clang-r416183b/bin/llvm-nm --version
-
-echo "=======检查ld：======="
-~/clang-r416183b/bin/ld.lld -v
-
-echo "=======查objcopy：======="
-~/clang-r416183b/bin/llvm-objcopy --version
-
-echo "=======检查objdump：======="
-~/clang-r416183b/bin/llvm-objdump --version
-
-echo "=======检查strip：======="
-~/clang-r416183b/bin/llvm-strip --version
-
-echo "=======检查aarch64-linux-gnu-gcc：======="
-aarch64-linux-gnu-gcc -v
-
-echo "=======检查arm-linux-gnueabi-gcc：======="
-arm-linux-gnueabi-gcc -v
-
-echo "====================检查环境结束==================="
+echo "=======检查工具链版本：======="
+~/clang-r416183b/bin/clang --version | head -1
+~/clang-r416183b/bin/llvm-ar --version | head -1
+~/clang-r416183b/bin/llvm-nm --version | head -1
+~/clang-r416183b/bin/ld.lld --version | head -1
+~/clang-r416183b/bin/llvm-objcopy --version | head -1
+~/clang-r416183b/bin/llvm-objdump --version | head -1
+~/clang-r416183b/bin/llvm-strip --version | head -1
+aarch64-linux-gnu-gcc --version | head -1
+arm-linux-gnueabi-gcc --version | head -1
+echo "====================检查结束==================="
 
 echo "=== 步骤2：修复字符问题 ==="
-cd /home/runner/work/android-docker-support-kernel/android-docker-support-kernel/kernel_source/bsp/kernel5.4/kernel5.4
 dos2unix sound/soc/codecs/aw883xx/Kconfig
 dos2unix drivers/vendor/common/touchscreen_v2/chipone_tddi_pad/Kconfig
 dos2unix drivers/vendor/common/tfa9873/Kconfig
