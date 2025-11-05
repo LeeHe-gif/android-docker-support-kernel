@@ -2,7 +2,15 @@ name: Build ZTE U30AIR Kernel
 
 on:
   workflow_dispatch:
-  
+    inputs:
+      device_config:
+        description: "chose config"
+        required: false
+        default: "nolto-u30air-defconfig"
+        type: choice
+        options:
+          - nolto-u30air-defconfig
+          - my-u30air-defconfig
 env:
   TZ: Asia/Shanghai
 
@@ -33,7 +41,7 @@ jobs:
       - name: Build kernel with clang 12.1.0 (clang-r416183b)
         run: |
           cp build5.sh kernel_source/bsp/kernel5.4/kernel5.4/
-          cp my_U30Air_defconfig kernel_source/bsp/kernel5.4/kernel5.4/arch/arm64/configs/
+          cp ${{ inputs.device_config }} kernel_source/bsp/kernel5.4/kernel5.4/arch/arm64/configs/
           cd kernel_source/bsp/kernel5.4/kernel5.4/
           chmod 755 build5.sh
           ./build5.sh
