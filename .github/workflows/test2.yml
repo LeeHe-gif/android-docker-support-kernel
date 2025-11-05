@@ -22,6 +22,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Setup massive swap
+        run: |
+          free -h
+          # 创建大容量swap文件 - 这是关键！
+          sudo fallocate -l 32G /swapfile
+          sudo chmod 600 /swapfile
+          sudo mkswap /swapfile
+          sudo swapon /swapfile
+          # 显示内存信息
+          free -h
+          echo "Swap setup completed"
+    
       - name: Show hardware info
         run: |
           chmod 755 ./show_hardware_info.sh
@@ -39,7 +51,7 @@ jobs:
 
       - name: wget kernel source
         run: |
-          wget -q U30Air_AndroidT_kernel-5.4.254.tar.gz "https://download.ztedevices.com/device/global/support/opensource/2/20240424_01/U30Air_AndroidT_kernel(5.4.254).tar.gz#W3"
+          wget -O -q U30Air_AndroidT_kernel-5.4.254.tar.gz "https://download.ztedevices.com/device/global/support/opensource/2/20240424_01/U30Air_AndroidT_kernel(5.4.254).tar.gz#W3"
           mkdir -p kernel_source
           tar -xzf U30Air_AndroidT_kernel-5.4.254.tar.gz -C kernel_source
   
