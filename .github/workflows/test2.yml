@@ -22,6 +22,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Show hardware info
+        run: |
+          chmod 755 ./show_hardware_info.sh
+          ./show_hardware_info.sh
+
       - name: Install basic dependencies
         run: |
           sudo apt-get update
