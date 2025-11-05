@@ -34,19 +34,12 @@ arm-linux-gnueabi-gcc -v
 
 echo "====================检查环境结束==================="
 
-echo "=== 步骤2: 配置内核 ==="
-cd /home/runner/work/android-docker-support-kernel/android-docker-support-kernel/kernel_source/bsp/kernel5.4/kernel5.4/
-mkdir out
-cp arch/arm64/configs/${{ inputs.device_config }} out/.config
-
-# 转换所有有问题的文件
+echo "=== 步骤2：修复字符问题 ==="
 dos2unix sound/soc/codecs/aw883xx/Kconfig
 dos2unix drivers/vendor/common/touchscreen_v2/chipone_tddi_pad/Kconfig
 dos2unix drivers/vendor/common/tfa9873/Kconfig
 dos2unix drivers/vendor/common/sensor/sar/aw9610x/Kconfig
 dos2unix drivers/vendor/soc/sprd/Kconfig
-
-# 同时修复其他格式问题
 dos2unix drivers/vendor/common/touchscreen_v2/Kconfig
 dos2unix drivers/vendor/common/sensor/sar/Kconfig
 dos2unix drivers/vendor/common/zte_lcdbl/Kconfig
