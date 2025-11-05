@@ -41,7 +41,8 @@ jobs:
       - name: Build kernel with clang 12.1.0 (clang-r416183b)
         run: |
           cp build5.sh kernel_source/bsp/kernel5.4/kernel5.4/
-          cp ${{ inputs.device_config }} kernel_source/bsp/kernel5.4/kernel5.4/arch/arm64/configs/
+          mkdir -p kernel_source/bsp/kernel5.4/kernel5.4/out
+          cp ${{ inputs.device_config }} kernel_source/bsp/kernel5.4/kernel5.4/out/
           cd kernel_source/bsp/kernel5.4/kernel5.4/
           chmod 755 build5.sh
           ./build5.sh
