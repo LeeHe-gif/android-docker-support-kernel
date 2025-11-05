@@ -22,7 +22,7 @@ jobs:
             libncurses-dev bison bc flex libssl-dev \
             gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi \
             libelf-dev rsync kmod git cpio wget zip \
-            unzip python3 python-is-python3 make xz-utils python3-pip ccache rsync
+            unzip python3 python-is-python3 make xz-utils python3-pip ccache rsync dos2unix
 
       - name: wget kernel source
         run: |
