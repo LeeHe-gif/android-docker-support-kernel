@@ -1,0 +1,52 @@
+name: Build ZTE U30AIR Kernel
+
+on:
+  workflow_dispatch:
+  
+env:
+  TZ: Asia/Shanghai
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install basic dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            curl build-essential \
+            libncurses-dev bison bc flex libssl-dev \
+            gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi \
+            libelf-dev rsync kmod git cpio wget zip \
+            unzip python3 python-is-python3 make xz-utils python3-pip ccache rsync
+
+      - name: wget kernel source
+        run: |
+          wget -O U30Air_AndroidT_kernel-5.4.254.tar.gz "https://download.ztedevices.com/device/global/support/opensource/2/20240424_01/U30Air_AndroidT_kernel(5.4.254).tar.gz#W3"
+          mkdir -p U30Air_AndroidT_kernel-5.4.254
+          tar -xzf U30Air_AndroidT_kernel-5.4.254.tar.gz -C kernel_source
+  
+      - name: Build kernel with clang 12.1.0 (clang-r416183b)
+        run: |
+          cp build5.sh kernel_source/bsp/kernel5.4/kernel5.4/
+          cp my_U30Air_defconfig kernel_source/bsp/kernel5.4/kernel5.4/arch/arm64/configs/
+          cd kernel_source/bsp/kernel5.4/kernel5.4/
+          chmod 755 build5.sh
+          ./build5.sh
+          
+      - name: Create out directory archive
+        run: |
+          cd kernel_source/bsp/kernel5.4/kernel5.4
+          zip -r kernel_boot_directory.zip out/arch/arm64/boot
+        
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: u30air-kernel-build-artifacts-2
+          path: |
+            kernel_source/bsp/kernel5.4/kernel5.4/kernel_boot_directory.zip
+          retention-days: 30
