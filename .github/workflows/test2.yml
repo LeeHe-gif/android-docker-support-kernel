@@ -27,7 +27,7 @@ jobs:
       - name: wget kernel source
         run: |
           wget -O U30Air_AndroidT_kernel-5.4.254.tar.gz "https://download.ztedevices.com/device/global/support/opensource/2/20240424_01/U30Air_AndroidT_kernel(5.4.254).tar.gz#W3"
-          mkdir -p U30Air_AndroidT_kernel-5.4.254
+          mkdir -p kernel_source
           tar -xzf U30Air_AndroidT_kernel-5.4.254.tar.gz -C kernel_source
   
       - name: Build kernel with clang 12.1.0 (clang-r416183b)
