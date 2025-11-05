@@ -35,6 +35,7 @@ arm-linux-gnueabi-gcc -v
 echo "====================检查环境结束==================="
 
 echo "=== 步骤2：修复字符问题 ==="
+cd /home/runner/work/android-docker-support-kernel/android-docker-support-kernel/kernel_source/bsp/kernel5.4/kernel5.4
 dos2unix sound/soc/codecs/aw883xx/Kconfig
 dos2unix drivers/vendor/common/touchscreen_v2/chipone_tddi_pad/Kconfig
 dos2unix drivers/vendor/common/tfa9873/Kconfig
