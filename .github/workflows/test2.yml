@@ -10,7 +10,7 @@ on:
         type: choice
         options:
           - nolto-u30air-defconfig
-          - my-u30air-defconfig
+          - my_U30Air_defconfig
 env:
   TZ: Asia/Shanghai
 
