@@ -67,7 +67,7 @@ jobs:
           cp build5.sh kernel_source/bsp/kernel5.4/kernel5.4/
           mkdir -p kernel_source/bsp/kernel5.4/kernel5.4/out
           cp ${{ inputs.device_config }} kernel_source/bsp/kernel5.4/kernel5.4/out/
-          cd kernel_source/bsp/kernel5.4/kernel5.4/
+          cd kernel_source/bsp/kernel5.4/kernel5.4/.config
           chmod 755 build5.sh
           ./build5.sh
           
