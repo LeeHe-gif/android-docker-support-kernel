@@ -32,7 +32,7 @@ jobs:
   
       - name: Build kernel with clang 12.1.0 (clang-r416183b)
         run: |
-          cp build4.sh kernel_source/
+          cp scripts/build4.sh kernel_source/
           cd kernel_source
           chmod 755 build4.sh
           ./build4.sh

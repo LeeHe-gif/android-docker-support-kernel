@@ -2,15 +2,7 @@ name: Build ZTE U30AIR Kernel
 
 on:
   workflow_dispatch:
-    inputs:
-      device_config:
-        description: "chose config"
-        required: false
-        default: "nolto-u30air-defconfig"
-        type: choice
-        options:
-          - nolto-u30air-defconfig
-          - my_U30Air_defconfig
+
 env:
   TZ: Asia/Shanghai
 
@@ -43,8 +35,8 @@ jobs:
     
       - name: Show hardware info
         run: |
-          chmod 755 ./show_hardware_info.sh
-          ./show_hardware_info.sh
+          chmod 755 ./scripts/show_hardware_info.sh
+          ./scripts/show_hardware_info.sh
 
       - name: Install basic dependencies
         run: |
@@ -54,7 +46,8 @@ jobs:
             libncurses-dev bison bc flex libssl-dev \
             gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi \
             libelf-dev rsync kmod git cpio wget zip \
-            unzip python3 python-is-python3 make xz-utils python3-pip ccache rsync dos2unix
+            unzip python3 python-is-python3 make \
+            xz-utils python3-pip ccache rsync dos2unix
 
       - name: wget kernel source
         run: |
@@ -64,9 +57,9 @@ jobs:
   
       - name: Build kernel with clang 12.1.0 (clang-r416183b)
         run: |
-          cp build5.sh kernel_source/bsp/kernel5.4/kernel5.4/
+          cp scripts/build5.sh kernel_source/bsp/kernel5.4/kernel5.4/
           mkdir -p kernel_source/bsp/kernel5.4/kernel5.4/out
-          cp ${{ inputs.device_config }} kernel_source/bsp/kernel5.4/kernel5.4/out/.config
+          cp config/my_U30Air_defconfig kernel_source/bsp/kernel5.4/kernel5.4/out/.config
           cd kernel_source/bsp/kernel5.4/kernel5.4/
           chmod 755 build5.sh
           ./build5.sh

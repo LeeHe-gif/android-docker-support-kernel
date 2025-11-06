@@ -36,7 +36,7 @@ jobs:
   
       - name: Build kernel with clang 14.0.2(clang-r445002)
         run: |
-          cp build2.sh kernel_source/
+          cp scripts/build2.sh kernel_source/
           cd kernel_source
           chmod 755 build2.sh
           ./build2.sh
