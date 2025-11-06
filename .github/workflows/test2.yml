@@ -1,4 +1,4 @@
-name: Build ZTE U30AIR Kernel
+name: Build ZTE U30AIR Kernel and Create Release
 
 on:
   workflow_dispatch:
@@ -24,12 +24,11 @@ jobs:
       - name: Setup massive swap
         run: |
           free -h
-          # 创建大容量swap文件 - 这是关键！
+          # 创建大容量swap文件 
           sudo fallocate -l 32G /swapfile
           sudo chmod 600 /swapfile
           sudo mkswap /swapfile
           sudo swapon /swapfile
-          # 显示内存信息
           free -h
           echo "Swap setup completed"
     
