@@ -12,6 +12,15 @@ on:
           - original
           - changed
 
+      thread:
+        description: "Compile thread"
+        required: false
+        default: "all"
+        type: boolean
+        options:
+          - all
+          - 1
+
 env:
   TZ: Asia/Shanghai
 
@@ -65,6 +74,9 @@ jobs:
   
       - name: Build kernel with clang 12.1.0 (clang-r416183b)
         run: |
+          if [[ "${{ inputs.thread }}" == "1" ]]; then
+            sed -i 's/make -j$(nproc --all) O=out /make -j1 V=s O=out /' scripts/build5.sh
+          fi
           cp scripts/build5.sh kernel_source/bsp/kernel5.4/kernel5.4/
           mkdir -p kernel_source/bsp/kernel5.4/kernel5.4/out
           if [[ "${{ inputs.config }}" == "original" ]]; then
@@ -78,10 +90,11 @@ jobs:
           
       - name: Create out directory archive
         run: |
-          cd kernel_source/bsp/kernel5.4/kernel5.4
+          cd kernel_source/bsp/kernel5.4/kernel5.4/
           du -h -d0 out
           du -h -d1 out
-          zip -r kernel_boot_directory.zip out/
+          cd out
+          zip ../kernel_boot_directory.zip -r .
         
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
