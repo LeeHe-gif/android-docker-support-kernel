@@ -2,6 +2,15 @@ name: Build ZTE U30AIR Kernel and Create Release
 
 on:
   workflow_dispatch:
+    inputs:
+      config:
+        description: "chose the config"
+        required: false
+        default: "original"
+        type: choice
+        options:
+          - original
+          - changed
 
 env:
   TZ: Asia/Shanghai
@@ -58,7 +67,11 @@ jobs:
         run: |
           cp scripts/build5.sh kernel_source/bsp/kernel5.4/kernel5.4/
           mkdir -p kernel_source/bsp/kernel5.4/kernel5.4/out
-          cp config/my_U30Air_defconfig kernel_source/bsp/kernel5.4/kernel5.4/out/.config
+          if [[ "${{ inputs.config }}" == "original" ]]; then
+            cp config/config kernel_source/bsp/kernel5.4/kernel5.4/out/.config
+          else
+            cp config/my_U30Air_defconfig kernel_source/bsp/kernel5.4/kernel5.4/out/.config
+          fi
           cd kernel_source/bsp/kernel5.4/kernel5.4/
           chmod 755 build5.sh
           ./build5.sh
@@ -68,7 +81,7 @@ jobs:
           cd kernel_source/bsp/kernel5.4/kernel5.4
           du -h -d0 out
           du -h -d1 out
-          zip -r kernel_boot_directory.zip out/arch/arm64/boot
+          zip -r kernel_boot_directory.zip out/
         
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
