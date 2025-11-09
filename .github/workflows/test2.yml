@@ -66,6 +66,8 @@ jobs:
       - name: Create out directory archive
         run: |
           cd kernel_source/bsp/kernel5.4/kernel5.4
+          du -h -d0 out
+          du -h -d1 out
           zip -r kernel_boot_directory.zip out/arch/arm64/boot
         
       - name: Upload artifacts
