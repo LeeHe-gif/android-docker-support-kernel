@@ -93,7 +93,7 @@ jobs:
           cd kernel_source/bsp/kernel5.4/kernel5.4/
           cd out
           ls -a
- zip -r kernel_out_directory.zip sound scripts block crypto virt fs certs init lib security arch kernel usr mm ipc net include drivers .config vmlinux vmlinux.o .config.old .tmp*_ .version .vmlinux.cmd .missing-syscalls.d modules.builtin modules.builtin.modinfo modules.order Makefile Module.symvers System.map
+          zip -r kernel_out_directory.zip sound scripts block crypto virt fs certs init lib security arch kernel usr mm ipc net include drivers .config vmlinux vmlinux.o .config.old .tmp*_ .version .vmlinux.cmd .missing-syscalls.d modules.builtin modules.builtin.modinfo modules.order Makefile Module.symvers System.map
           ls -a
         
       - name: Upload artifacts
