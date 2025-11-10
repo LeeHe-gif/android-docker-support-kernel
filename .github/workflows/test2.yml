@@ -100,7 +100,7 @@ jobs:
         with:
           name: u30air-kernel-build-artifacts-2
           path: |
-            kernel_source/bsp/kernel5.4/kernel5.4/kernel_out_directory.zip
+            kernel_source/bsp/kernel5.4/kernel5.4/out/kernel_out_directory.zip
           retention-days: 30
 
   release:
