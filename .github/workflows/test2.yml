@@ -91,17 +91,16 @@ jobs:
       - name: Create out directory archive
         run: |
           cd kernel_source/bsp/kernel5.4/kernel5.4/
-          du -h -d0 out
-          du -h -d1 out
           cd out
-          zip ../kernel_boot_directory.zip -r .
+          ls -a
+          zip -r -q kernel_out_directory.zip sound scripts block crypto virt fs certs init lib security arch kernel usr mm ipc net include drivers .config
         
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: u30air-kernel-build-artifacts-2
           path: |
-            kernel_source/bsp/kernel5.4/kernel5.4/kernel_boot_directory.zip
+            kernel_source/bsp/kernel5.4/kernel5.4/kernel_out_directory.zip
           retention-days: 30
 
   release:
@@ -133,7 +132,7 @@ jobs:
             # Kernel Build
           
             ## 包含文件：
-            - `kernel_boot_directory.zip` - 完整的编译输出目录
+            - `kernel_out_directory.zip` - 完整的编译输出目录
             ## 说明：
             - ✅ 基于 [这个](https://github.com/Enceka/android_kernel_zte_ums9620_mifi_u30air.git) 内核源码
             - ✅ 使用 clang 12.1.0 编译
@@ -141,6 +140,6 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            ./artifacts/kernel_boot_directory.zip
+            ./artifacts/kernel_out_directory.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
