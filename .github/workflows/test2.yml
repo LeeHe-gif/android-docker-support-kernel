@@ -12,15 +12,6 @@ on:
           - original
           - changed
 
-      thread:
-        description: "Compile thread"
-        required: false
-        default: "all"
-        type: choice
-        options:
-          - all
-          - 1
-
 env:
   TZ: Asia/Shanghai
 
@@ -74,9 +65,6 @@ jobs:
   
       - name: Build kernel with clang 12.1.0 (clang-r416183b)
         run: |
-          if [[ "${{ inputs.thread }}" == "1" ]]; then
-            sed -i 's/make -j$(nproc --all) O=out /make -j1 V=s O=out /' scripts/build5.sh
-          fi
           cp scripts/build5.sh kernel_source/bsp/kernel5.4/kernel5.4/
           mkdir -p kernel_source/bsp/kernel5.4/kernel5.4/out
           if [[ "${{ inputs.config }}" == "original" ]]; then
@@ -92,9 +80,7 @@ jobs:
         run: |
           cd kernel_source/bsp/kernel5.4/kernel5.4/
           cd out
-          ls -a
-          zip -r kernel_out_directory.zip sound scripts block crypto virt fs certs init lib security arch kernel usr mm ipc net include drivers .config vmlinux vmlinux.o .config.old .tmp*_ .version .vmlinux.cmd .missing-syscalls.d modules.builtin modules.builtin.modinfo modules.order Makefile Module.symvers System.map
-          ls -a
+          zip -r kernel_out_directory.zip arch .config vmlinux vmlinux.o .config.old .vmlinux.cmd Makefile
         
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -133,10 +119,10 @@ jobs:
             # Kernel Build
           
             ## 包含文件：
-            - `kernel_out_directory.zip` - 完整的编译输出目录
+            - `kernel_out_directory.zip` - 部分的编译输出目录
             ## 说明：
-            - ✅ 基于 [这个](https://github.com/Enceka/android_kernel_zte_ums9620_mifi_u30air.git) 内核源码
-            - ✅ 使用 clang 12.1.0 编译
+            - ✅ 基于 [ZTE官方ZTE - Opensource](https://opensource.ztedevices.com/) 内核源码
+            - ✅ 使用 [clang-r416183b](https://android.googlesource.com/platform//prebuilts/clang/host/linux-x86/+/b669748458572622ed716407611633c5415da25c/clang-r416183b/) 工具链编译
 
           draft: false
           prerelease: false
