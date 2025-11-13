@@ -1,0 +1,132 @@
+name: Build ZTE F50 Kernel and Create Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      config:
+        description: "chose the config"
+        required: false
+        default: "original"
+        type: choice
+        options:
+          - original
+          - changed
+
+env:
+  TZ: Asia/Shanghai
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Free disk space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: true
+          android: true
+          dotnet: true
+
+      - name: Setup massive swap
+        run: |
+          free -h
+          # 创建大容量swap文件 
+          sudo fallocate -l 32G /swapfile
+          sudo chmod 600 /swapfile
+          sudo mkswap /swapfile
+          sudo swapon /swapfile
+          free -h
+          echo "Swap setup completed"
+    
+      - name: Show hardware info
+        run: |
+          chmod 755 ./scripts/show_hardware_info.sh
+          ./scripts/show_hardware_info.sh
+
+      - name: Install basic dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            curl build-essential \
+            libncurses-dev bison bc flex libssl-dev \
+            gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi \
+            libelf-dev rsync kmod git cpio wget zip \
+            unzip python3 python-is-python3 make u-boot-tools \
+            xz-utils python3-pip ccache rsync dos2unix
+
+      - name: wget kernel source
+        run: |
+          wget -O F50_Android13_kernel-5.4.210.tar.gz "https://download.ztedevices.com/device/global/support/opensource/2/20230714_01/F50_Android13_kernel(5.4.210).tar.gz#W3"
+          mkdir -p kernel_source
+          tar -xzf F50_Android13_kernel-5.4.210.tar.gz -C kernel_source
+  
+      - name: Build kernel with clang 12.1.0 (clang-r416183b)
+        run: |
+          cp scripts/build5.sh kernel_source/bsp/kernel5.4/kernel5.4/
+          mkdir -p kernel_source/bsp/kernel5.4/kernel5.4/out
+          if [[ "${{ inputs.config }}" == "original" ]]; then
+            cp config/config_F50 kernel_source/bsp/kernel5.4/kernel5.4/out/.config
+          else
+            cp config/my_F50_defconfig kernel_source/bsp/kernel5.4/kernel5.4/out/.config
+          fi
+          cd kernel_source/bsp/kernel5.4/kernel5.4/
+          chmod 755 build5.sh
+          ./build5.sh
+          
+      - name: Create out directory archive
+        run: |
+          cd kernel_source/bsp/kernel5.4/kernel5.4/
+          cd out
+          zip -r kernel_out_directory.zip arch .config vmlinux vmlinux.o .config.old .vmlinux.cmd Makefile
+        
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: F50-kernel-build-artifacts
+          path: |
+            kernel_source/bsp/kernel5.4/kernel5.4/out/kernel_out_directory.zip
+          retention-days: 30
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: success()
+
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: F50-kernel-build-artifacts
+          path: ./artifacts
+
+      - name: List downloaded artifacts
+        run: |
+          echo "当前目录结构:"
+          pwd
+          ls -la
+          echo "Artifacts 目录结构:"
+          ls -la ./artifacts/
+          
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: "ZTE-F50-kernel-build"
+          name: "ZTE-F50 kernel build"
+          body: |
+            # Kernel Build
+          
+            ## 包含文件：
+            - `kernel_out_directory.zip` - 部分的编译输出目录
+            ## 说明：
+            - ✅ 基于 [ZTE官方ZTE - Opensource](https://opensource.ztedevices.com/) 内核源码
+            - ✅ 使用 [clang-r416183b](https://android.googlesource.com/platform//prebuilts/clang/host/linux-x86/+/b669748458572622ed716407611633c5415da25c/clang-r416183b/) 工具链编译
+
+          draft: false
+          prerelease: false
+          files: |
+            ./artifacts/kernel_out_directory.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
