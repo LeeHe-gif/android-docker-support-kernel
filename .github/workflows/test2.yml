@@ -68,7 +68,7 @@ jobs:
           cp scripts/build5.sh kernel_source/bsp/kernel5.4/kernel5.4/
           mkdir -p kernel_source/bsp/kernel5.4/kernel5.4/out
           if [[ "${{ inputs.config }}" == "original" ]]; then
-            cp config/config kernel_source/bsp/kernel5.4/kernel5.4/out/.config
+            cp config/config_U30Air kernel_source/bsp/kernel5.4/kernel5.4/out/.config
           else
             cp config/my_U30Air_defconfig kernel_source/bsp/kernel5.4/kernel5.4/out/.config
           fi
