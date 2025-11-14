@@ -95,8 +95,8 @@ jobs:
         run: |
           cd kernel_source/bsp/kernel5.4/kernel5.4/
           cd out
+          du -b arch/arm64/boot/Image
           zip -r kernel_out_directory.zip arch .config
-          du -h -d1
         
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
