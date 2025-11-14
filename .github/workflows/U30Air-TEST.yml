@@ -40,11 +40,6 @@ jobs:
           restore-keys: |
             clang-r416183b
 
-      - name: check
-        run: |
-          mv clang-r416183b ~/clang-r416183b
-          ls ~/
-
       - name: Free disk space
         uses: jlumbroso/free-disk-space@main
         with:
@@ -90,18 +85,15 @@ jobs:
           cd kernel_source/bsp/kernel5.4/kernel5.4/
           chmod 755 build5.sh
           ./build5.sh
-          
-      - name: Create out directory archive
+
+      - name: Check Image size
         run: |
-          cd kernel_source/bsp/kernel5.4/kernel5.4/
-          cd out
-          du -b arch/arm64/boot/Image
-          zip -r kernel_out_directory.zip arch .config
-        
+          du -b kernel_source/bsp/kernel5.4/kernel5.4/out/arch/arm64/boot/Image
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: u30air-kernel-build-artifacts-2
           path: |
-            kernel_source/bsp/kernel5.4/kernel5.4/out/kernel_out_directory.zip
-          retention-days: 30
+            kernel_source/bsp/kernel5.4/kernel5.4/out/arch/arm64/boot/*
+            kernel_source/bsp/kernel5.4/kernel5.4/out/.config
