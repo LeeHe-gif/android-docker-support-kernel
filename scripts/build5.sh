@@ -1,10 +1,6 @@
 #!/bin/bash
-echo "=== 步骤1: 设置 clang 12.0.1 ==="
-ls clang-r416183b
-mv clang-r416183b ~/clang-r416183b
-rm clang-r416183b.tar.gz
 
-echo "=======检查工具链版本：======="
+echo "======= 步骤2：检查工具链版本：======="
 ~/clang-r416183b/bin/clang --version | head -1
 ~/clang-r416183b/bin/llvm-ar --version | head -1
 ~/clang-r416183b/bin/llvm-nm --version | head -1
