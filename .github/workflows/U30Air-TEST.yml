@@ -42,16 +42,8 @@ jobs:
 
       - name: check
         run: |
-          du -h -d1
-          ls ~/
           mv clang-r416183b ~/clang-r416183b
-          echo "=== 检查clang-r416183b缓存结果 ==="
-          if [ -f "~/clang-r416183b" ]; then
-              echo "✅ clang-r416183b缓存成功"
-          else
-              echo "❌ clang-r416183b缓存失败"
-              exit 1
-          fi
+          ls ~/
 
       - name: Free disk space
         uses: jlumbroso/free-disk-space@main
