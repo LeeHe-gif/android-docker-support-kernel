@@ -1,5 +1,5 @@
 # .github/workflows/update-kernel-cache.yml
-name: Update Kernel Cache
+name: Update u30air Kernel source Cache
 
 on:
   workflow_dispatch:  # 手动触发
