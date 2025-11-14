@@ -17,7 +17,6 @@ jobs:
       - name: Download kernel source
         run: |
           echo "开始下载工具链..."
-          cd ~/
           wget -q https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/tags/android-12.1.0_r26/clang-r416183b.tar.gz
           mkdir -p clang-r416183b
           tar -xf clang-r416183b.tar.gz -C clang-r416183b
@@ -26,7 +25,7 @@ jobs:
       - name: Save to cache
         uses: actions/cache@v3
         with:
-          path: ~/clang-r416183b
+          path: clang-r416183b
           key: clang-r416183b
           restore-keys: |
             clang-r416183b
