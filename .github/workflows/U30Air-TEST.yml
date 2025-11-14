@@ -32,6 +32,13 @@ jobs:
           restore-keys: |
             kernel-source-u30air-5.4.254
 
+      - name: Cache clang toolchain
+        uses: actions/cache@v3
+        id: cache-clang
+        with:
+          path: ~/clang-r416183b
+          key: clang-r416183b
+
       - name: Free disk space
         uses: jlumbroso/free-disk-space@main
         with:
