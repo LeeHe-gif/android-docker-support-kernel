@@ -1,0 +1,37 @@
+# .github/workflows/update-kernel-cache.yml
+name: Update Kernel Cache
+
+on:
+  workflow_dispatch:  # 手动触发
+  # schedule:
+  #  - cron: '0 0 * * 0'  # 每周日 00:00 UTC 更新
+
+jobs:
+  update-cache:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Download kernel source
+        run: |
+          echo "开始下载内核源码..."
+          wget -O U30Air_AndroidT_kernel-5.4.254.tar.gz "https://download.ztedevices.com/device/global/support/opensource/2/20240424_01/U30Air_AndroidT_kernel(5.4.254).tar.gz#W3"
+          mkdir -p kernel_source
+          tar -xzf U30Air_AndroidT_kernel-5.4.254.tar.gz -C kernel_source
+          echo "内核源码下载完成"
+          
+      - name: Save to cache
+        uses: actions/cache@v3
+        with:
+          path: kernel_source
+          key: kernel-source-u30air-5.4.254
+          restore-keys: |
+            kernel-source-u30air-5.4.254
+            
+      - name: Show cache info
+        run: |
+          echo "缓存已更新"
+          echo "缓存key: kernel-source-u30air-5.4.254"
+          echo "下次构建将使用此缓存"
