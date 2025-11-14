@@ -33,5 +33,5 @@ jobs:
       - name: Show cache info
         run: |
           echo "缓存已更新"
-          echo "缓存key: clang-r416183b
+          echo "缓存key: clang-r416183b"
           echo "下次构建将使用此缓存"
