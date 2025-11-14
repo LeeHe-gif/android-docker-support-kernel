@@ -1,4 +1,4 @@
-name: Build ZTE U30AIR Kernel and Create Release
+name: Build ZTE U30AIR Kernel
 
 on:
   workflow_dispatch:
