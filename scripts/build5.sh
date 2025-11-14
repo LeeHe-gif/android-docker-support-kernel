@@ -1,8 +1,6 @@
 #!/bin/bash
 echo "=== 步骤1: 设置 clang 12.0.1 ==="
-wget -q https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/tags/android-12.1.0_r26/clang-r416183b.tar.gz
-mkdir clang-r416183b
-tar -xf clang-r416183b.tar.gz -C clang-r416183b
+ls clang-r416183b
 mv clang-r416183b ~/clang-r416183b
 rm clang-r416183b.tar.gz
 
