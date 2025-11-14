@@ -2,19 +2,7 @@
 
 mv clang-r416183b ~/clang-r416183b
 
-echo "======= 步骤1：检查工具链版本：======="
-~/clang-r416183b/bin/clang --version | head -1
-~/clang-r416183b/bin/llvm-ar --version | head -1
-~/clang-r416183b/bin/llvm-nm --version | head -1
-~/clang-r416183b/bin/ld.lld --version | head -1
-~/clang-r416183b/bin/llvm-objcopy --version | head -1
-~/clang-r416183b/bin/llvm-objdump --version | head -1
-~/clang-r416183b/bin/llvm-strip --version | head -1
-aarch64-linux-gnu-gcc --version | head -1
-arm-linux-gnueabi-gcc --version | head -1
-echo "====================检查结束==================="
-
-echo "=== 步骤2：修复字符问题 ==="
+echo "=== 步骤1：修复字符问题 ==="
 dos2unix sound/soc/codecs/aw883xx/Kconfig
 dos2unix drivers/vendor/common/touchscreen_v2/chipone_tddi_pad/Kconfig
 dos2unix drivers/vendor/common/tfa9873/Kconfig
@@ -28,7 +16,7 @@ echo "" >> drivers/vendor/common/sensor/sar/Kconfig
 echo "" >> drivers/vendor/common/zte_lcdbl/Kconfig
 sed -i '82s/bool " /bool "/' drivers/vendor/common/touchscreen_v2/Kconfig
 
-echo "=== 步骤3: 开始编译 ==="
+echo "=== 步骤2: 开始编译 ==="
 make -j$(nproc --all) O=out \
     ARCH=arm64 \
     CC=~/clang-r416183b/bin/clang \
@@ -42,7 +30,7 @@ make -j$(nproc --all) O=out \
     CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
     KCFLAGS="-Wno-array-bounds -Wformat -Wsometimes-uninitialized -Wformat-extra-args -Wformat-security -Wunknown-warning-option -Wunused-result -Wuninitialized -Wno-error -Wno-pointer-sign"
     
-echo "=== 步骤4：检查编译结果 ==="
+echo "=== 步骤3：检查编译结果 ==="
 if [ -f "out/arch/arm64/boot/Image.gz" ]; then
     echo "✅ 内核编译成功"
 else
