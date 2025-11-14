@@ -35,14 +35,15 @@ jobs:
       - name: Cache clang toolchain
         uses: actions/cache@v3
         with:
-          path: ~/clang-r416183b
+          path: clang-r416183b
           key: clang-r416183b
           restore-keys: |
             clang-r416183b
 
-      - name: Show hardware info
+      - name: check
         run: |
-          mv clang-r416183b ~/clang-r416183b
+          du -h -d1
+          ls ~/
           echo "=== 检查clang-r416183b缓存结果 ==="
           if [ -f "~/clang-r416183b" ]; then
               echo "✅ clang-r416183b缓存成功"
