@@ -42,6 +42,7 @@ jobs:
 
       - name: Show hardware info
         run: |
+          mv clang-r416183b ~/clang-r416183b
           echo "=== 检查clang-r416183b缓存结果 ==="
           if [ -f "~/clang-r416183b" ]; then
               echo "✅ clang-r416183b缓存成功"
