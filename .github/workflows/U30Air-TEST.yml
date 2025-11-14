@@ -92,7 +92,8 @@ jobs:
         run: |
           cd kernel_source/bsp/kernel5.4/kernel5.4/
           cd out
-          zip -r kernel_out_directory.zip arch .config vmlinux vmlinux.o .config.old .vmlinux.cmd Makefile
+          zip -r kernel_out_directory.zip arch .config
+          du -h -d1
         
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
