@@ -23,6 +23,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Cache kernel source
+        uses: actions/cache@v3
+        id: cache-kernel
+        with:
+          path: kernel_source
+          key: kernel-source-u30air-5.4.254
+          restore-keys: |
+            kernel-source-u30air-
+
       - name: Free disk space
         uses: jlumbroso/free-disk-space@main
         with:
@@ -33,7 +42,6 @@ jobs:
       - name: Setup massive swap
         run: |
           free -h
-          # 创建大容量swap文件 
           sudo fallocate -l 32G /swapfile
           sudo chmod 600 /swapfile
           sudo mkswap /swapfile
@@ -57,17 +65,20 @@ jobs:
             unzip python3 python-is-python3 make u-boot-tools \
             xz-utils python3-pip ccache rsync dos2unix
 
-      - name: wget kernel source
+      - name: Download kernel source (if not cached)
+        if: steps.cache-kernel.outputs.cache-hit != 'true'
         run: |
           wget -O U30Air_AndroidT_kernel-5.4.254.tar.gz "https://download.ztedevices.com/device/global/support/opensource/2/20240424_01/U30Air_AndroidT_kernel(5.4.254).tar.gz#W3"
           mkdir -p kernel_source
           tar -xzf U30Air_AndroidT_kernel-5.4.254.tar.gz -C kernel_source
-  
+          # 创建缓存标识文件
+          date > kernel_source/cache_version.txt
+
       - name: Build kernel with clang 12.1.0 (clang-r416183b)
         run: |
           cp scripts/build5.sh kernel_source/bsp/kernel5.4/kernel5.4/
           mkdir -p kernel_source/bsp/kernel5.4/kernel5.4/out
-          if [[ "${{ inputs.config }}" == "original" ]]; then
+          if [[ "${{ github.event.inputs.config }}" == "original" ]]; then
             cp config/config_U30Air kernel_source/bsp/kernel5.4/kernel5.4/out/.config
           else
             cp config/my_U30Air_defconfig kernel_source/bsp/kernel5.4/kernel5.4/out/.config
