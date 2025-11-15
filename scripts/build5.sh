@@ -1,7 +1,5 @@
 #!/bin/bash
 
-mv clang-r416183b ~/clang-r416183b
-
 echo "=== 步骤1：修复字符问题 ==="
 dos2unix sound/soc/codecs/aw883xx/Kconfig
 dos2unix drivers/vendor/common/touchscreen_v2/chipone_tddi_pad/Kconfig
