@@ -93,7 +93,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: u30air-kernel-build-artifacts-2
+          name: u30air-kernel-build-artifacts-docker-full
           path: |
             kernel_source/bsp/kernel5.4/kernel5.4/out/arch/arm64/boot/*
             kernel_source/bsp/kernel5.4/kernel5.4/out/.config
