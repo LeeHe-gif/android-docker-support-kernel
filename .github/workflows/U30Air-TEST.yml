@@ -86,6 +86,7 @@ jobs:
           cd kernel_source/bsp/kernel5.4/kernel5.4/
           chmod 755 build5.sh
           ./build5.sh
+          cp out/.config config
 
       - name: Check Image size
         run: |
@@ -94,7 +95,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: u30air-kernel-build-artifacts-docker-full
+          name: u30air-kernel-build-artifacts-2
           path: |
             kernel_source/bsp/kernel5.4/kernel5.4/out/arch/arm64/boot/*
-            kernel_source/bsp/kernel5.4/kernel5.4/out/.config
+            kernel_source/bsp/kernel5.4/kernel5.4/config
