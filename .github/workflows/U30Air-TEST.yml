@@ -75,6 +75,7 @@ jobs:
 
       - name: Build kernel with clang 12.1.0 (clang-r416183b)
         run: |
+          mv clang-r416183b ~/clang-r416183b
           cp scripts/build5.sh kernel_source/bsp/kernel5.4/kernel5.4/
           mkdir -p kernel_source/bsp/kernel5.4/kernel5.4/out
           if [[ "${{ github.event.inputs.config }}" == "original" ]]; then
