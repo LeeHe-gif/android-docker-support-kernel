@@ -6,7 +6,7 @@ on:
       config:
         description: "chose the config"
         required: false
-        default: "original"
+        default: "changed"
         type: choice
         options:
           - original
@@ -81,7 +81,7 @@ jobs:
           if [[ "${{ github.event.inputs.config }}" == "original" ]]; then
             cp config/config_U30Air kernel_source/bsp/kernel5.4/kernel5.4/out/.config
           else
-            cp config/my_U30Air_defconfig kernel_source/bsp/kernel5.4/kernel5.4/out/.config
+            cp config/my_U30Air_docker_config kernel_source/bsp/kernel5.4/kernel5.4/out/.config
           fi
           cd kernel_source/bsp/kernel5.4/kernel5.4/
           chmod 755 build5.sh
