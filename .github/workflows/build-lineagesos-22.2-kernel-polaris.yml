@@ -66,7 +66,7 @@ jobs:
           mv clang-r365631c ~/clang-r365631c
           cp scripts/build4.sh kernel_source/
           mkdir -p kernel_source/out
-          cp config/polaris_linageos22.2_config kernel_source/.config
+          cp config/polaris_linageos22.2_config kernel_source/out/.config
           cd kernel_source/
           chmod 755 build4.sh
           ./build4.sh
