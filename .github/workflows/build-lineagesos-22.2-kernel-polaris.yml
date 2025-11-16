@@ -1,0 +1,145 @@
+name: Build polaris Lineagesos-22.2 Kernel
+
+on:
+  workflow_dispatch:
+
+env:
+  TZ: Asia/Shanghai
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Cache clang toolchain
+        uses: actions/cache@v3
+        with:
+          path: clang-r365631c
+          key: clang-r365631c
+          restore-keys: |
+            clang-r365631c
+
+      - name: Free disk space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: true
+          android: true
+          dotnet: true
+
+      - name: Setup massive swap
+        run: |
+          free -h
+          sudo fallocate -l 32G /swapfile
+          sudo chmod 600 /swapfile
+          sudo mkswap /swapfile
+          sudo swapon /swapfile
+          free -h
+          echo "Swap setup completed"
+    
+      - name: Show hardware info
+        run: |
+          chmod 755 ./scripts/show_hardware_info.sh
+          ./scripts/show_hardware_info.sh
+
+      - name: Install basic dependencies
+        run: |
+          sudo timedatectl set-timezone "$TZ"
+          sudo apt-get update
+          sudo apt-get install -y \
+            curl build-essential \
+            libncurses-dev bison bc flex libssl-dev \
+            gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi \
+            libelf-dev rsync kmod git cpio wget zip \
+            unzip python3 python-is-python3 make u-boot-tools \
+            xz-utils python3-pip ccache rsync dos2unix
+
+      - name: Clone anykernel3 an kernel source repository
+        run: |
+          git clone https://github.com/LeeHe-gif/AnyKernel3.git anykernel3
+          git clone -b ineagesos-22.2 --depth 1 https://github.com/LineageOS/android_kernel_xiaomi_sdm845.git kernel_source
+
+      - name: Build kernel with clang-r365631c
+        run: |
+          mv clang-r365631c ~/clang-r365631c
+          cp scripts/build4.sh kernel_source/
+          mkdir -p kernel_source/out
+          cp config/polaris_linageos22.2_config kernel_source/.config
+          cd kernel_source/
+          chmod 755 build4.sh
+          ./build4.sh
+          cp out/.config config
+
+      - name: Create out directory archive
+        run: |
+          cd kernel_source
+          zip -r kernel_boot_directory.zip out/arch/arm64/boot
+
+      - name: Create anykernel3 package
+        run: |
+          cp kernel_source/out/arch/arm64/boot/Image.gz-dtb anykernel3/
+          cd anykernel3/
+          zip -r polaris_linageos22.2_dockerkernel.zip anykernel.sh Image.gz-dtb META-INF modules patch tools
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: polaris-lineageos-kernel-build-artifacts
+          path: |
+            AnyKernel3/polaris_linageos22.2_dockerkernel.zip
+            kernel_source/kernel_boot_directory.zip
+  
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: success()
+
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: polaris-lineageos-kernel-build-artifacts
+          path: ./artifacts
+
+      - name: List downloaded artifacts
+        run: |
+          echo "当前目录结构:"
+          pwd
+          ls -la
+          echo "Artifacts 目录结构:"
+          ls -la ./artifacts/
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: "polarish-lineageos22.2-kernel-build"
+          name: "polaris LineageOS 22.2 Kernel Build"
+          body: |
+            # polaris LineageOS 22.2 Kernel Build
+          
+            小米mix2s(polaris) LineageOS 22.2 版本内核
+            分支：lineage-22.2
+            特性：开启内核docker支持
+            ## 包含文件：
+            - `polaris_lineageos22.2-dockerkernel.zip` - AnyKernel3 刷机包
+            - `kernel_boot_directory.zip` - 完整的编译输出目录
+          
+            ## 特性：
+            - ✅ 完整 Docker 容器支持
+            - ✅ 基于 [LineageOS 22.2](https://github.com/LineageOS/android_kernel_xiaomi_sdm845) 内核源码
+            
+            ## 刷机说明
+            1. 下载 `polaris_linageos22.2_dockerkernel.zip`
+            2. 通过 TWRP Recovery 刷入
+            3. 重启设备
+          
+            **注意：** 刷机前请备份重要数据。
+          draft: false
+          prerelease: false
+          files: |
+            ./artifacts/AnyKernel3/polaris_linageos22.2_dockerkernel.zip
+            ./artifacts/kernel_source/kernel_boot_directory.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
