@@ -10,7 +10,7 @@ make -j$(nproc --all) O=out \
     STRIP=~/clang-r365631c/bin/llvm-strip \
     CROSS_COMPILE=aarch64-linux-gnu- \
     CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
-    KCFLAGS="-Wno-error=implicit-function-declaration -Wno-array-bounds -Wformat -Wsometimes-uninitialized -Wformat-extra-args -Wformat-security -Wunknown-warning-option -Wunused-result -Wuninitialized -Wno-error -Wno-pointer-sign"
+    KCFLAGS="-Wno-error=implicit-function-declaration -Wno-array-bounds -Wformat -Wsometimes-uninitialized -Wformat-extra-args -Wformat-security -Wunknown-warning-option -Wunused-result -Wuninitialized -Wno-pointer-sign"
     
 echo "=== 检查编译结果 ==="
 if [ -f "out/arch/arm64/boot/Image.gz" ]; then
