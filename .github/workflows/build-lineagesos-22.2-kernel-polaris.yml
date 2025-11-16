@@ -59,7 +59,7 @@ jobs:
       - name: Clone anykernel3 an kernel source repository
         run: |
           git clone https://github.com/LeeHe-gif/AnyKernel3.git anykernel3
-          git clone -b ineagesos-22.2 --depth 1 https://github.com/LineageOS/android_kernel_xiaomi_sdm845.git kernel_source
+          git clone -b lineagesos-22.2 --depth 1 https://github.com/LineageOS/android_kernel_xiaomi_sdm845.git kernel_source
 
       - name: Build kernel with clang-r365631c
         run: |
