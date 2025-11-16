@@ -88,7 +88,7 @@ jobs:
         with:
           name: polaris-lineageos-kernel-build-artifacts
           path: |
-            AnyKernel3/polaris_linageos22.2_dockerkernel.zip
+            anykernel3/polaris_linageos22.2_dockerkernel.zip
             kernel_source/kernel_boot_directory.zip
   
   release:
@@ -139,7 +139,7 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            ./artifacts/AnyKernel3/polaris_linageos22.2_dockerkernel.zip
+            ./artifacts/anykernel3/polaris_linageos22.2_dockerkernel.zip
             ./artifacts/kernel_source/kernel_boot_directory.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
