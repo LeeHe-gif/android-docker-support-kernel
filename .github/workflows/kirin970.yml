@@ -26,17 +26,13 @@ jobs:
             libelf-dev rsync kmod git cpio wget zip \
             unzip python3 python-is-python3 make xz-utils python3-pip ccache rsync
 
-      - name: Cache Python 2.7
-        uses: actions/cache@v4
-        with:
-          path: Python-2.7.18
-          key: python-2.7.18
-          restore-keys: |
-            python-2.7.18
-
-      - name: install python2.7 from cache
+      - name: Build and Install Python 2.7 
         run: |
-          cd  Python-2.7.18
+          wget -q https://www.python.org/ftp/python/2.7.18/Python-2.7.18.tgz
+          tar -xzf Python-2.7.18.tgz
+          cd Python-2.7.18
+          ./configure --enable-optimizations
+          make -j$(nproc)
           make install
           python --version
 
