@@ -29,7 +29,7 @@ jobs:
       - name: Cache Python 2.7
         uses: actions/cache@v4
         with:
-          path: python-2.7.18
+          path: Python-2.7.18
           key: python-2.7.18
           restore-keys: |
             python-2.7.18
