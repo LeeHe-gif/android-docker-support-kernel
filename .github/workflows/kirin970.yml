@@ -1,0 +1,81 @@
+name: Build kirin970
+
+on:
+  workflow_dispatch:
+  
+env:
+  REPO_URL: https://github.com/LeeHe-gif/kirin970-kernel-based-on-emui9.1.git
+  REPO_BRANCH: main
+  TZ: Asia/Shanghai
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install basic dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            curl build-essential \
+            libncurses-dev bison bc flex libssl-dev \
+            gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi \
+            libelf-dev rsync kmod git cpio wget zip \
+            unzip python3 python-is-python3 make xz-utils python3-pip ccache rsync
+
+      - name: Build and Install Python 2.7
+        run: |
+          echo "Installing Python 2.7.18 from source..."
+          cd /tmp
+          wget -q https://www.python.org/ftp/python/2.7.18/Python-2.7.18.tgz
+          tar -xzf Python-2.7.18.tgz
+          cd Python-2.7.18
+          ./configure --enable-optimizations --prefix=/tmp/python-2.7.18
+          make -j$(nproc)
+          make install
+          cd ..
+          rm -rf Python-2.7.18*
+
+      - name: Clone kernel source and setup KernelSU
+        run: |
+          git clone --depth 1 $REPO_URL -b $REPO_BRANCH kernel_source
+          cd kernel_source
+          rm -rf KernelSU-Next
+          curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s v0.9.5
+
+      - name: Build kernel
+        run: |
+          cp scripts/build6.sh kernel_source/
+          cd kernel_source
+          chmod 755 build6.sh
+          ./build6.sh
+
+      - name: pack bootimg
+        run: |
+          cd kernel_source
+          chmod 755 pack.sh
+          ./pack.sh
+          ls
+
+      - name: Verify build output
+        run: |
+          echo "检查构建输出:"
+          ls -la build_out/ || echo "构建输出目录不存在"
+          [ -f "build_out/*.img" ] && echo "✅ boot文件 存在" || echo "❌ boot文件 不存在"
+
+      - name: Create out directory archive
+        run: |
+          cd kernel_source
+          zip -r kernel_boot_directory.zip out/arch/arm64/boot
+        
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: kirin970-kernel-build-artifacts
+          path: |
+            build_out/*
+            kernel_source/kernel_boot_directory.zip
+          retention-days: 30
