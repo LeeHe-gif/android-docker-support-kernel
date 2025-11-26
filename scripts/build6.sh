@@ -3,6 +3,8 @@ cd ~
 mkdir ToolChains
 wget https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-a/10.3-2021.07/binrel/gcc-arm-10.3-2021.07-x86_64-aarch64-none-linux-gnu.tar.xz
 tar -xJf gcc-arm-10.3-2021.07-x86_64-aarch64-none-linux-gnu.tar.xz -C ToolChains
+cd ToolChains
+mv  gcc-arm-10.3-2021.07-x86_64-aarch64-none-linux-gnu gcc-arm-10.3
 
 cd /home/runner/work/android-docker-support-kernel/android-docker-support-kernel/kernel_source
 
