@@ -64,8 +64,8 @@ jobs:
       - name: Verify build output
         run: |
           echo "检查构建输出:"
-          ls -la build_out/ || echo "构建输出目录不存在"
-          [ -f "build_out/*.img" ] && echo "✅ boot文件 存在" || echo "❌ boot文件 不存在"
+          ls -la kernel_source/build_out/ || echo "构建输出目录不存在"
+          [ -f "kernel_source/build_out/*.img" ] && echo "✅ boot文件 存在" || echo "❌ boot文件 不存在"
 
       - name: Create out directory archive
         run: |
@@ -77,6 +77,6 @@ jobs:
         with:
           name: kirin970-kernel-build-artifacts
           path: |
-            build_out/*
+            kernel_source/build_out/*.img
             kernel_source/kernel_boot_directory.zip
           retention-days: 30
