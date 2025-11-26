@@ -37,7 +37,7 @@ jobs:
       - name: install python2.7 from cache
         run: |
           cd  Python-2.7.18
-          make install
+          sudo make install
           python --version
 
       - name: Clone kernel source and setup KernelSU
