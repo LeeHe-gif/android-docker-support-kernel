@@ -1,4 +1,4 @@
-name: Build kirin970
+name: Build-Emui9.1-kernek-kirin970
 
 on:
   workflow_dispatch:
@@ -38,7 +38,6 @@ jobs:
         run: |
           cd  Python-2.7.18
           sudo make install
-          python --version
 
       - name: Clone kernel source and setup KernelSU
         run: |
@@ -58,13 +57,6 @@ jobs:
           cd kernel_source
           chmod 755 pack.sh
           ./pack.sh
-          ls
-
-      - name: Verify build output
-        run: |
-          echo "检查构建输出:"
-          ls -la kernel_source/build_out/ || echo "构建输出目录不存在"
-          [ -f "kernel_source/build_out/*.img" ] && echo "✅ boot文件 存在" || echo "❌ boot文件 不存在"
 
       - name: Create out directory archive
         run: |
@@ -79,3 +71,54 @@ jobs:
             kernel_source/build_out/*.img
             kernel_source/kernel_boot_directory.zip
           retention-days: 30
+          
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: success()
+
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: kirin970-kernel-build-artifacts
+          path: ./artifacts
+
+      - name: List downloaded artifacts
+        run: |
+          echo "当前目录结构:"
+          pwd
+          ls -la
+          echo "Artifacts 目录结构:"
+          ls -la ./artifacts/
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: "kirin970-kernel-build"
+          name: "kirin970 Kernel Build"
+          body: |
+            # kirin970 Kernel Build
+
+            华为 nova3 docker support 内核
+            ## 包含文件：
+            - `kernel-20xxxxxx-enforcing.img`
+            - `kernel-20xxxxxx-permissive.img`
+            - `kernel_boot_directory.zip` - 完整的编译输出目录
+
+            ## 特性：
+            - ✅ 完整 Docker 容器支持
+            - ✅ 基于 [kirin970-kernel-based-on-emui9.1](https://github.com/LeeHe-gif/kirin970-kernel-based-on-emui9.1)** 源码
+
+            ## 刷机说明
+            1. 下载 boot img 镜像，刷入
+            2. 重启设备
+
+            **注意：** 刷机前请备份重要数据。
+          draft: false
+          prerelease: false
+          files: |
+            ./artifacts/kernel_source/build_out/*.img
+            ./artifacts/kernel_source/kernel_boot_directory.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
