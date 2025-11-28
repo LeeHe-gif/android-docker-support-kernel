@@ -1,4 +1,4 @@
-name: Build-Emui9.1-kernek-kirin970
+name: Build Emui9.1 kernek kirin970 and Create Release
 
 on:
   workflow_dispatch:
