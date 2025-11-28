@@ -118,7 +118,7 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            ./artifacts/kernel_source/build_out/*.img
-            ./artifacts/kernel_source/kernel_boot_directory.zip
+            ./artifacts/build_out/*.img
+            ./artifacts/kernel_boot_directory.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
