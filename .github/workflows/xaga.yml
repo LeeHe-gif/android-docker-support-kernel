@@ -1,0 +1,94 @@
+name: Build xaga Kernel
+
+on:
+  workflow_dispatch:
+#    inputs:
+#      config:
+#        description: "chose the config"
+#        required: false
+#        default: "changed"
+#        type: choice
+#        options:
+#          - original
+#          - changed
+
+env:
+  REPO_URL: https://github.com/ArkZioPrimeReborn/android_kernel_xiaomi_mt6895.git
+  REPO_BRANCH: 16
+  TZ: Asia/Shanghai
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Cache clang toolchain
+        uses: actions/cache@v3
+        with:
+          path: clang-r416183b
+          key: clang-r416183b
+          restore-keys: |
+            clang-r416183b
+
+      - name: Clone kernel source
+        run: |
+          git clone --depth 1 $REPO_URL -b $REPO_BRANCH kernel_source
+
+      - name: Free disk space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: true
+          android: true
+          dotnet: true
+
+      - name: Setup massive swap
+        run: |
+          free -h
+          sudo fallocate -l 32G /swapfile
+          sudo chmod 600 /swapfile
+          sudo mkswap /swapfile
+          sudo swapon /swapfile
+          free -h
+          echo "Swap setup completed"
+    
+      - name: Show hardware info
+        run: |
+          chmod 755 ./scripts/show_hardware_info.sh
+          ./scripts/show_hardware_info.sh
+
+      - name: Install basic dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            curl build-essential \
+            libncurses-dev bison bc flex libssl-dev \
+            gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi \
+            libelf-dev rsync kmod git cpio wget zip \
+            unzip python3 python-is-python3 make u-boot-tools \
+            xz-utils python3-pip ccache rsync dos2unix
+
+      - name: Build kernel with clang 12.1.0 (clang-r416183b)
+        run: |
+          mv clang-r416183b ~/clang-r416183b
+          cp scripts/build7.sh kernel_source/
+          mkdir -p kernel_source/out
+          cp config/config_xaga kernel_source/arch/arm64/configs/my_xaga_defconfig
+          cd kernel_source/
+          chmod 755 build7.sh
+          ./build7.sh
+          cp out/.config config
+
+      - name: Check Image size
+        run: |
+          du -b kernel_source/out/arch/arm64/boot/Image
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: xaga-kernel-build-artifacts-2
+          path: |
+            kernel_source/out/arch/arm64/boot/*
+            kernel_source/config
