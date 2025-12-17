@@ -1,27 +1,32 @@
 #!/bin/bash
 
-echo "=== 步骤1: 配置内核 ==="
 make O=out ARCH=arm64 my_xaga_defconfig \
     ARCH=arm64 \
-    AR=~/ToolChains/gcc-arm-10.3/aarch64-none-linux-gnu/bin/ar \
-    NM=~/ToolChains/gcc-arm-10.3/aarch64-none-linux-gnu/bin/nm \
-    LD=~/ToolChains/gcc-arm-10.3/aarch64-none-linux-gnu/bin/ld \
-    OBJCOPY=~/ToolChains/gcc-arm-10.3/aarch64-none-linux-gnu/bin/objcopy \
-    OBJDUMP=~/ToolChains/gcc-arm-10.3/aarch64-none-linux-gnu/bin/objdump \
-    STRIP=~/ToolChains/gcc-arm-10.3/aarch64-none-linux-gnu/bin/strip \
+    CC=~/clang-r416183b/bin/clang \
+    AR=~/clang-r416183b/bin/llvm-ar \
+    NM=~/clang-r416183b/bin/llvm-nm \
+    LD=~/clang-r416183b/bin/ld.lld \
+    OBJCOPY=~/clang-r416183b/bin/llvm-objcopy \
+    OBJDUMP=~/clang-r416183b/bin/llvm-objdump \
+    STRIP=~/clang-r416183b/bin/llvm-strip \
     CROSS_COMPILE=aarch64-linux-gnu- \
     CROSS_COMPILE_ARM32=arm-linux-gnueabi-
-echo "=== 步骤3: 开始编译内核 ==="
+
+
+echo "=== 开始编译 ==="
 make -j$(nproc --all) O=out \
     ARCH=arm64 \
-    AR=~/ToolChains/gcc-arm-10.3/aarch64-none-linux-gnu/bin/ar \
-    NM=~/ToolChains/gcc-arm-10.3/aarch64-none-linux-gnu/bin/nm \
-    LD=~/ToolChains/gcc-arm-10.3/aarch64-none-linux-gnu/bin/ld \
-    OBJCOPY=~/ToolChains/gcc-arm-10.3/aarch64-none-linux-gnu/bin/objcopy \
-    OBJDUMP=~/ToolChains/gcc-arm-10.3/aarch64-none-linux-gnu/bin/objdump \
-    STRIP=~/ToolChains/gcc-arm-10.3/aarch64-none-linux-gnu/bin/strip \
+    CC=~/clang-r416183b/bin/clang \
+    AR=~/clang-r416183b/bin/llvm-ar \
+    NM=~/clang-r416183b/bin/llvm-nm \
+    LD=~/clang-r416183b/bin/ld.lld \
+    OBJCOPY=~/clang-r416183b/bin/llvm-objcopy \
+    OBJDUMP=~/clang-r416183b/bin/llvm-objdump \
+    STRIP=~/clang-r416183b/bin/llvm-strip \
     CROSS_COMPILE=aarch64-linux-gnu- \
-    CROSS_COMPILE_ARM32=arm-linux-gnueabi-
+    CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
+    KCFLAGS="-Wno-array-bounds -Wformat -Wsometimes-uninitialized -Wformat-extra-args -Wformat-security -Wunknown-warning-option -Wunused-result -Wuninitialized -Wno-error -Wno-pointer-sign"
+  
 echo "=== 步骤4：检查编译结果 ==="
 if [ -f "out/arch/arm64/boot/Image.gz" ]; then
     echo "✅ 内核编译成功"
