@@ -25,5 +25,6 @@ if [ -f "out/arch/arm64/boot/Image.gz" ]; then
     echo "✅ 内核编译成功"
 else
     echo "❌ 内核编译失败 - Image.gz 未生成"
+    ls out/arch/arm64/boot/
     exit 1
 fi
