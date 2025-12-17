@@ -1,4 +1,22 @@
 #!/bin/bash
+echo "=== 修复字符串警告 ==="
+dos2unix drivers/input/touchscreen/goodix_9916/Kconfig
+sed -i '16,17s|$|"|' drivers/input/misc/Kconfig
+cat > sound/soc/codecs/aw882xxV11/Kconfig << 'EOF'
+config SND_SMARTPA_AW882XX_V11
+	tristate "SoC Audio for awinic aw882xxseries"
+	depends on I2C
+	help
+	  Say Y here to enable AWINIC AW882XX V11 SmartPA driver support.
+	  This driver provides support for AW882XX audio amplifier.
+
+config SND_SMARTPA_AW882XX_GPIO_CONFIG_V11
+	tristate "SoC Audio for awinic aw882xxseries config reset GPIO"
+	depends on I2C
+	help
+	  Enable GPIO configuration for AW882XX V11 SmartPA.
+	  This includes reset and interrupt pin configurations.
+EOF
 
 make O=out ARCH=arm64 my_xaga_defconfig \
     ARCH=arm64 \
