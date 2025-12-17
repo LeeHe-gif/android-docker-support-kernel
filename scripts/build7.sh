@@ -1,3 +1,5 @@
+#!/bin/bash
+
 echo "=== 步骤1: 配置内核 ==="
 make O=out ARCH=arm64 my_xaga_defconfig \
     ARCH=arm64 \
