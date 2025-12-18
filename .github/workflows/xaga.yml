@@ -75,7 +75,7 @@ jobs:
           mv clang-r416183b ~/clang-r416183b
           cp scripts/build7.sh kernel_source/
           mkdir -p kernel_source/out
-          cp config/config_xaga kernel_source/arch/arm64/configs/my_xaga_defconfig
+          # cp config/config_xaga kernel_source/arch/arm64/configs/my_xaga_defconfig
           cd kernel_source/
           chmod 755 build7.sh
           ./build7.sh
@@ -83,7 +83,7 @@ jobs:
 
       - name: Check Image size
         run: |
-          du -b kernel_source/out/arch/arm64/boot/Image
+          du -h kernel_source/out/arch/arm64/boot/Image
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
