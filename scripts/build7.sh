@@ -43,7 +43,7 @@ make -j$(nproc --all) O=out \
     STRIP=~/clang-r416183b/bin/llvm-strip \
     CROSS_COMPILE=aarch64-linux-gnu- \
     CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
-    KCFLAGS="-Wno-array-bounds -Wno-format -Wno-format-security -Wsometimes-uninitialized -Wno-format-extra-args -Wunknown-warning-option -Wunused-result -Wuninitialized -Wno-error -Wno-pointer-sign"
+    KCFLAGS="-Wno-array-bounds -Wno-format -Wno-format-security -Wsometimes-uninitialized -Wno-format-extra-args -Wunknown-warning-option -Wunused-result -Wuninitialized -Wno-error -Wno-pointer-sign -Wno-incompatible-pointer-types"
   
 echo "=== 步骤4：检查编译结果 ==="
 if [ -f "out/arch/arm64/boot/Image.gz" ]; then
