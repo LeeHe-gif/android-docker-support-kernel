@@ -32,6 +32,9 @@ jobs:
       - name: Clone kernel source
         run: |
           git clone --depth 1 $REPO_URL -b $REPO_BRANCH kernel_source
+          cd kernel_source
+          rm -rf KernelSU-Next
+          curl -LSs "https://raw.githubusercontent.com/KernelSU-Next/KernelSU-Next/next/kernel/setup.sh" | bash -
 
       - name: Free disk space
         uses: jlumbroso/free-disk-space@main
@@ -72,7 +75,6 @@ jobs:
           mv clang-r416183b ~/clang-r416183b
           cp scripts/build7.sh kernel_source/
           mkdir -p kernel_source/out
-          # cp config/config_xaga kernel_source/arch/arm64/configs/my_xaga_defconfig
           cd kernel_source/
           chmod 755 build7.sh
           ./build7.sh
@@ -134,7 +136,6 @@ jobs:
           unzip gki-kernel.zip && rm gki-kernel.zip
 
           echo "Unpacking boot.img..."
-          # 根据你的实际情况调整 boot.img 文件名
           BOOT_IMG_FILE=$(ls boot-*.img | head -1)
           echo "Found boot image: $BOOT_IMG_FILE"
           
@@ -143,7 +144,6 @@ jobs:
           echo "Building boot.img with custom kernel..."
           cp $KERNEL_IMAGE ./Image
           
-          # 构建 boot.img，根据你的设备调整参数
           $MKBOOTIMG \
             --header_version 4 \
             --kernel Image \
