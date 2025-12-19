@@ -34,8 +34,7 @@ jobs:
           git clone --depth 1 $REPO_URL -b $REPO_BRANCH kernel_source
           cd kernel_source
           rm -rf KernelSU-Next
-          curl -LSs "https://raw.githubusercontent.com/KernelSU-Next/KernelSU-Next/next/kernel/setup.sh" | bash -
-
+          curl -LSs "https://raw.githubusercontent.com/KernelSU-Next/KernelSU-Next/next/kernel/setup.sh" | bash -s v1.5.5
       - name: Free disk space
         uses: jlumbroso/free-disk-space@main
         with:
