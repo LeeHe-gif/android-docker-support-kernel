@@ -24,10 +24,10 @@ jobs:
       - name: Cache clang toolchain
         uses: actions/cache@v3
         with:
-          path: clang-r416183b
-          key: clang-r416183b
+          path: clang-r416183b1
+          key: clang-r416183b1
           restore-keys: |
-            clang-r416183b
+            clang-r416183b1
 
       - name: Clone kernel source
         run: |
@@ -70,9 +70,9 @@ jobs:
             xz-utils python3-pip ccache rsync dos2unix \
             lz4  # 添加 lz4 支持
 
-      - name: Build kernel with clang 12.1.0 (clang-r416183b)
+      - name: Build kernel with clang 12.0.7 (clang-r416183b1)
         run: |
-          mv clang-r416183b ~/clang-r416183b
+          mv clang-r416183b1 ~/clang-r416183b1
           cp scripts/build7.sh kernel_source/
           mkdir -p kernel_source/out
           cd kernel_source/
