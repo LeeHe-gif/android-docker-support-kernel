@@ -2,6 +2,7 @@
 echo "=== 修复字符串警告 ==="
 dos2unix drivers/input/touchscreen/goodix_9916/Kconfig
 dos2unix drivers/input/touchscreen/goodix_9916/Kconfig
+echo "" >> drivers/gpu/drm/mediatek/Kconfig
 sed -i '16,17s|$|"|' drivers/input/misc/Kconfig
 cat > sound/soc/codecs/aw882xxV11/Kconfig << 'EOF'
 config SND_SMARTPA_AW882XX_V11
