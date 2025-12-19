@@ -2,15 +2,6 @@ name: Build xaga Kernel
 
 on:
   workflow_dispatch:
-#    inputs:
-#      config:
-#        description: "chose the config"
-#        required: false
-#        default: "changed"
-#        type: choice
-#        options:
-#          - original
-#          - changed
 
 env:
   REPO_URL: https://github.com/LeeHe-gif/android_kernel_xiaomi_mt6895.git
@@ -20,8 +11,13 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    outputs:
+      TIME: ${{ steps.set-time.outputs.TIME }}
     steps:
+      - name: Get current time
+        id: set-time
+        run: echo "TIME=$(date +'%Y%m%d')" >> $GITHUB_ENV && echo "TIME=$(date +'%Y%m%d')" >> $GITHUB_OUTPUT
+      
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -68,7 +64,8 @@ jobs:
             gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi \
             libelf-dev rsync kmod git cpio wget zip \
             unzip python3 python-is-python3 make u-boot-tools \
-            xz-utils python3-pip ccache rsync dos2unix
+            xz-utils python3-pip ccache rsync dos2unix \
+            lz4  # 添加 lz4 支持
 
       - name: Build kernel with clang 12.1.0 (clang-r416183b)
         run: |
@@ -85,10 +82,99 @@ jobs:
         run: |
           du -h kernel_source/out/arch/arm64/boot/Image
 
+      - name: Download toolchain and mkbootimg
+        run: |
+          AOSP_MIRROR=https://android.googlesource.com
+          BRANCH=main-kernel-build-2024
+          git clone $AOSP_MIRROR/kernel/prebuilts/build-tools -b $BRANCH --depth 1 kernel-build-tools
+          git clone $AOSP_MIRROR/platform/system/tools/mkbootimg -b $BRANCH --depth 1 mkbootimg
+          
+      - name: Set boot sign key
+        env:
+          BOOT_SIGN_KEY: ${{ secrets.BOOT_SIGN_KEY }}
+        run: |
+          if [ ! -z "$BOOT_SIGN_KEY" ]; then
+            echo "$BOOT_SIGN_KEY" > kernel-build-tools/linux-x86/share/avb/testkey_rsa2048.pem
+            echo "Boot sign key set successfully"
+          else
+            echo "BOOT_SIGN_KEY is not set. Will create unsigned boot image."
+          fi
+
+      - name: Initialize environment for building boot image
+        run: |
+          if [ -f "kernel-build-tools/linux-x86/share/avb/testkey_rsa2048.pem" ]; then
+            echo "BOOT_SIGN_KEY_PATH=$GITHUB_WORKSPACE/kernel-build-tools/linux-x86/share/avb/testkey_rsa2048.pem" >> $GITHUB_ENV
+          else
+            echo "BOOT_SIGN_KEY_PATH=" >> $GITHUB_ENV
+          fi
+          echo "AVBTOOL=$GITHUB_WORKSPACE/kernel-build-tools/linux-x86/bin/avbtool" >> $GITHUB_ENV
+          echo "MKBOOTIMG=$GITHUB_WORKSPACE/mkbootimg/mkbootimg.py" >> $GITHUB_ENV
+          echo "UNPACK_BOOTIMG=$GITHUB_WORKSPACE/mkbootimg/unpack_bootimg.py" >> $GITHUB_ENV
+          echo "KERNEL_IMAGE=$GITHUB_WORKSPACE/kernel_source/out/arch/arm64/boot/Image" >> $GITHUB_ENV
+
+      - name: Build boot image
+        run: |
+          mkdir bootimgs && cd bootimgs
+
+          GKI_URL=https://dl.google.com/android/gki/gki-certified-boot-android12-5.10-2025-02_r1.zip
+          FALLBACK_URL=https://dl.google.com/android/gki/gki-certified-boot-android12-5.10-2023-01_r1.zip
+
+          echo "Checking if GKI kernel URL is reachable: $GKI_URL"
+          status=$(curl -sL -w "%{http_code}" "$GKI_URL" -o /dev/null)
+
+          if [ "$status" = "200" ]; then
+              echo "[+] Downloading from GKI_URL"
+              curl -Lo gki-kernel.zip "$GKI_URL"
+          else
+              echo "[+] $GKI_URL not found, using $FALLBACK_URL"
+              curl -Lo gki-kernel.zip "$FALLBACK_URL"
+          fi
+
+          echo "Unzipping the downloaded kernel..."
+          unzip gki-kernel.zip && rm gki-kernel.zip
+
+          echo "Unpacking boot.img..."
+          # 根据你的实际情况调整 boot.img 文件名
+          BOOT_IMG_FILE=$(ls boot-*.img | head -1)
+          echo "Found boot image: $BOOT_IMG_FILE"
+          
+          $UNPACK_BOOTIMG --boot_img="$BOOT_IMG_FILE"
+
+          echo "Building boot.img with custom kernel..."
+          cp $KERNEL_IMAGE ./Image
+          
+          # 构建 boot.img，根据你的设备调整参数
+          $MKBOOTIMG \
+            --header_version 4 \
+            --kernel Image \
+            --ramdisk out/ramdisk \
+            --os_version 12.0.0 \
+            --os_patch_level 2025-02 \
+            --output boot.img
+
+          # 如果有签名密钥，则进行签名
+          if [ ! -z "$BOOT_SIGN_KEY_PATH" ] && [ -f "$BOOT_SIGN_KEY_PATH" ]; then
+            echo "Signing boot image..."
+            $AVBTOOL add_hash_footer \
+              --partition_name boot \
+              --partition_size $((64 * 1024 * 1024)) \
+              --image boot.img \
+              --algorithm SHA256_RSA2048 \
+              --key $BOOT_SIGN_KEY_PATH
+            IMG_NAME="xaga-signed-boot-${{ env.TIME }}.img"
+          else
+            echo "Creating unsigned boot image (no key provided)"
+            IMG_NAME="xaga-unsigned-boot-${{ env.TIME }}.img"
+          fi
+          
+          cp ./boot.img ../$IMG_NAME
+          echo "Boot image created: $IMG_NAME"
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: xaga-kernel-build-artifacts-2
+          name: xaga-kernel-build-artifacts
           path: |
             kernel_source/out/arch/arm64/boot/*
             kernel_source/config
+            xaga-*-boot-${{ env.TIME }}.img
