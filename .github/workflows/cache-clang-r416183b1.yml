@@ -1,0 +1,36 @@
+name: Update clang-r416183b1 Cache
+
+on:
+  workflow_dispatch:  # 手动触发
+  #schedule:
+  #  - cron: '0 0 * * 0'  # 每周日 00:00 UTC 更新
+
+jobs:
+  update-cache:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Download kernel source
+        run: |
+          echo "开始下载工具链..."
+          wget -q https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/tags/android-12.0.0_r12/clang-r416183b1.tar.gz
+          mkdir -p clang-r416183b1
+          tar -xf clang-r416183b1.tar.gz -C clang-r416183b1
+          echo "工具链下载完成"
+          
+      - name: Save to cache
+        uses: actions/cache@v3
+        with:
+          path: clang-r416183b1
+          key: clang-r416183b1
+          restore-keys: |
+            clang-r416183b1
+            
+      - name: Show cache info
+        run: |
+          echo "缓存已更新"
+          echo "缓存key: clang-r416183b1"
+          echo "下次构建将使用此缓存"
