@@ -159,7 +159,7 @@ jobs:
               --partition_name boot \
               --partition_size $((64 * 1024 * 1024)) \
               --image boot.img \
-              --algorithm SHA256_RSA2048 \
+              --algorithm SHA256_RSA4096 \
               --key $BOOT_SIGN_KEY_PATH
             IMG_NAME="xaga-signed-boot-${{ env.TIME }}.img"
           else
