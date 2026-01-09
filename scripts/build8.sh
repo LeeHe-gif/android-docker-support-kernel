@@ -1,4 +1,17 @@
 #!/bin/bash
+
+make O=out my_nabu_defconfig \
+    ARCH=arm64 \
+    CC=~/clang-r383902/bin/clang \
+    AR=~/clang-r383902/bin/llvm-ar \
+    NM=~/clang-r383902/bin/llvm-nm \
+    LD=~/clang-r383902/bin/ld.lld \
+    OBJCOPY=~/clang-r383902/bin/llvm-objcopy \
+    OBJDUMP=~/clang-r383902/bin/llvm-objdump \
+    STRIP=~/clang-r383902/bin/llvm-strip \
+    CROSS_COMPILE=aarch64-linux-gnu- \
+    CROSS_COMPILE_ARM32=arm-linux-gnueabi-
+
 make -j$(nproc --all) O=out \
     ARCH=arm64 \
     CC=~/clang-r383902/bin/clang \
