@@ -48,7 +48,7 @@ jobs:
             unzip python3 python-is-python3 make u-boot-tools \
             xz-utils python3-pip ccache rsync dos2unix
 
-      - name: Clone anykernel3 an kernel source repository
+      - name: Clone kernel source repository
         run: |
           git clone --depth 1 $REPO_URL -b $REPO_BRANCH kernel_source
 
