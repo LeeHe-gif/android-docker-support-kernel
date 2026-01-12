@@ -138,5 +138,6 @@ jobs:
           prerelease: false
           files: |
             ./artifacts/*
+            ./artifacts/out/arch/arm64/boot/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
