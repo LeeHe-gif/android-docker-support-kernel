@@ -10,6 +10,7 @@
 - **基于 [Arrow OS 12.1](https://github.com/LeeHe-gif/android_kernel_xiaomi_alioth)** 内核源码构建 alioth（Redmi k40）已测试在wifi下桥接网络与macvlan有问题，其他正常。
 - **基于 [ZTE - Opensource](https://opensource.ztedevices.com/)** 官方源码构建 ZTE U30Air 内核，正在测试中，目前仅原厂配置可以开机。
 - **基于 [kirin970-kernel-based-on-emui9.1](https://github.com/LeeHe-gif/kirin970-kernel-based-on-emui9.1)** 源码构建 华为nova3 内核，默认带ksu，开启docker支持可以开机，正在测试docker功能中。
+- **基于 [crDoird 12.5](https://github.com/LeeHe-gif/android_kernel_xiaomi_nabu)** 源码构建 nabu (MI pad 5) 内核，默认带ksu。
 ## ✅ Docker 支持状态
 
 根据内核配置检测，本内核已完整支持 Docker 运行环境：
@@ -31,13 +32,6 @@
   - `bridge`: ✅ 已启用
   - `ipvlan`: ✅ 已启用  
   - `macvlan`: ✅ 已启用
-
-## 📥 刷入方法
-
-### 前提条件
-- 已解锁 Bootloader
-- 已安装 TWRP Recovery
-- 备份重要数据
 
 ### 挂载cgroups
 
@@ -64,16 +58,3 @@ echo 1 > /proc/sys/net/ipv6/conf/default/forwarding
 wget https://github.com/moby/moby/raw/master/contrib/check-config.sh
 sh check-config.sh
 ```
-
-### 刷机步骤
-
-1. **下载文件**
-   - 从 Releases 页面下载对应设备最新的 `XXX_dockerkernel.zip`
-
-2. **进入 TWRP**
-
-3. **刷入polaris_dockerkernel.zip**
-
-4. **刷入magisk**
-
-5.**重启**
