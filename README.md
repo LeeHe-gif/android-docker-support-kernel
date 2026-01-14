@@ -9,7 +9,7 @@
 - **基于 [Lineage OS 22.2](https://github.com/LeeHe-gif/android_kernel_xiaomi_sdm845_lineage.git)** 内核源码构建 polaris（MI Mix2s）能开机，已测试BFP有问题，无法正常使用。
 - **基于 [Lineage OS 22.2](https://github.com/LeeHe-gif/android_kernel_xiaomi_sm8250_LineageOS/tree/lineage-22.2)** 内核源码构建 alioth（Redmi k40）已测试在wifi下桥接网络与macvlan有问题，其他正常。
 - **基于 [Arrow OS 12.1](https://github.com/LeeHe-gif/android_kernel_xiaomi_alioth)** 内核源码构建 alioth（Redmi k40）已测试在wifi下桥接网络与macvlan有问题，其他正常。
-- **基于 [ZTE - Opensource](https://opensource.ztedevices.com/)** 官方源码构建 ZTE U30Air 内核，正在测试中，目前仅原厂配置可以开机。
+- **基于 [ZTE - Opensource](https://opensource.ztedevices.com/)** 官方源码构建 ZTE U30Air 内核，似乎跟kernel大小有关，只要是38361600，哪怕配置与原厂不一样，仍然可以开机。
 - **基于 [kirin970-kernel-based-on-emui9.1](https://github.com/LeeHe-gif/kirin970-kernel-based-on-emui9.1)** 源码构建 华为nova3 内核，默认带ksu，开启docker支持可以开机，正在测试docker功能中。
 - **基于 [crDoird 12.5](https://github.com/LeeHe-gif/android_kernel_xiaomi_nabu)** 源码构建 nabu (MI pad 5) 内核，默认带ksu，已测试在wifi下桥接网络与macvlan有问题，其他正常
 ## ✅ Docker 支持状态
