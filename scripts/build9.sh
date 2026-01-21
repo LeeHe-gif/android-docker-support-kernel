@@ -13,7 +13,7 @@ make O=out my_803sh_defconfig \
     LLVM_IAS=1
 
 make -j$(nproc --all) O=out \
-    ARCH=$ARCH \
+    ARCH=arm64 \
     CC=clang \
     CLANG_TRIPLE=$CLANG_TRIPLE \
     CROSS_COMPILE=$CROSS_COMPILE \
