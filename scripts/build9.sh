@@ -1,29 +1,21 @@
 #!/bin/bash
 
-export CLANG_PATH=/home/runner/clang-r383902/bin
-export PATH=$CLANG_PATH:$PATH
+export CLANG_PREBUILT_BIN=/home/runner/clang-r383902/bin
+export GCC_PREBUILT_BIN=/home/runner/aarch64-linux-android-4.9/bin
+export PATH=$CLANG_PREBUILT_BIN:$GCC_PREBUILT_BIN:$PATH
 
 make O=out my_803sh_defconfig \
     ARCH=arm64 \
     CC=clang \
-    AR=llvm-ar \
-    NM=llvm-nm \
-    LD=ld.lld \
-    OBJCOPY=llvm-objcopy \
-    OBJDUMP=llvm-objdump \
-    STRIP=llvm-strip \
-    CROSS_COMPILE=aarch64-linux-gnu- \
-    CROSS_COMPILE_ARM32=arm-linux-gnueabi-
+    CLANG_TRIPLE=$CLANG_TRIPLE \
+    CROSS_COMPILE=$CROSS_COMPILE \
+    LLVM=1 \
+    LLVM_IAS=1
 
 make -j$(nproc --all) O=out \
-    ARCH=arm64 \
+    ARCH=$ARCH \
     CC=clang \
-    AR=llvm-ar \
-    NM=llvm-nm \
-    LD=ld.lld \
-    OBJCOPY=llvm-objcopy \
-    OBJDUMP=llvm-objdump \
-    STRIP=llvm-strip \
-    CROSS_COMPILE=aarch64-linux-gnu- \
-    CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
-    KCFLAGS="-fno-stack-protector -Wno-array-bounds -Wformat -Wsometimes-uninitialized -Wformat-extra-args -Wformat-security -Wunknown-warning-option -Wunused-result -Wuninitialized -Wno-error -Wno-pointer-sign"
+    CLANG_TRIPLE=$CLANG_TRIPLE \
+    CROSS_COMPILE=$CROSS_COMPILE \
+    LLVM=1 \
+    LLVM_IAS=1
