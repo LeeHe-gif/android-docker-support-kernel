@@ -1,0 +1,36 @@
+name: Update clang-r353983c Cache
+
+on:
+  workflow_dispatch:  # 手动触发
+  #schedule:
+  #  - cron: '0 0 * * 0'  # 每周日 00:00 UTC 更新
+
+jobs:
+  update-cache:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Download kernel source
+        run: |
+          echo "开始下载工具链..."
+          wget -q https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/emu-29.0-release/clang-r353983c.tar.gz
+          mkdir -p clang-r353983c
+          tar -xf clang-r353983c.tar.gz -C clang-r353983c
+          echo "工具链下载完成"
+          
+      - name: Save to cache
+        uses: actions/cache@v3
+        with:
+          path: clang-r353983c
+          key: clang-r353983c
+          restore-keys: |
+            clang-r353983c
+            
+      - name: Show cache info
+        run: |
+          echo "缓存已更新"
+          echo "缓存key: clang-r353983c"
+          echo "下次构建将使用此缓存"
