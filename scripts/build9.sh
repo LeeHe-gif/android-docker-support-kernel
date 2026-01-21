@@ -13,7 +13,8 @@ make O=out my_803sh_defconfig \
     OBJDUMP=llvm-objdump \
     STRIP=llvm-strip \
     CROSS_COMPILE=aarch64-linux-gnu- \
-    CROSS_COMPILE_ARM32=arm-linux-gnueabi-
+    CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
+    KCFLAGS="-fno-stack-protector -Wno-error"
 
 make -j$(nproc --all) O=out \
     ARCH=arm64 \
@@ -25,4 +26,5 @@ make -j$(nproc --all) O=out \
     OBJDUMP=llvm-objdump \
     STRIP=llvm-strip \
     CROSS_COMPILE=aarch64-linux-gnu- \
-    CROSS_COMPILE_ARM32=arm-linux-gnueabi-
+    CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
+    KCFLAGS="-fno-stack-protector -Wno-error"
