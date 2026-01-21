@@ -19,10 +19,10 @@ jobs:
       - name: Cache clang toolchain
         uses: actions/cache@v3
         with:
-          path: clang-r353983c
-          key: clang-r353983c
+          path: clang-r383902
+          key: clang-r383902
           restore-keys: |
-            clang-r353983c
+            clang-r383902
 
       - name: Install basic dependencies
         run: |
@@ -53,7 +53,7 @@ jobs:
 
       - name: Build kernel
         run: |
-          mv clang-r353983c ~/clang-r353983c
+          mv clang-r383902 ~/clang-r383902
           cp scripts/build9.sh kernel_source/
           cd kernel_source
           chmod 755 build9.sh
