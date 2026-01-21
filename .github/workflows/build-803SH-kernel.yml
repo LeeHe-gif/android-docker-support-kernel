@@ -1,0 +1,68 @@
+name: Build 803SH kernel
+
+on:
+  workflow_dispatch:
+  
+env:
+  REPO_URL: https://github.com/Ruyue-Kinsenka/android_kernel_sharp_msm-4.9.git
+  REPO_BRANCH: "LA.UM.8.3.r1-06300-sdm845.0"
+  TZ: Asia/Shanghai
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Cache clang toolchain
+        uses: actions/cache@v3
+        with:
+          path: clang-r353983c
+          key: clang-r353983c
+          restore-keys: |
+            clang-r353983c
+
+      - name: Install basic dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            curl build-essential \
+            libncurses-dev bison bc flex libssl-dev \
+            gcc-arm-linux-gnueabi xz-utils ccache rsync \
+            libelf-dev rsync kmod git cpio wget zip \
+            unzip make 
+            
+      - name: Cache Python 2.7
+        uses: actions/cache@v4
+        with:
+          path: Python-2.7.18
+          key: python-2.7.18
+          restore-keys: |
+            python-2.7.18
+
+      - name: install python2.7 from cache
+        run: |
+          cd Python-2.7.18
+          sudo make install
+
+      - name: Clone kernel source
+        run: |
+          git clone --depth 1 $REPO_URL -b $REPO_BRANCH kernel_source
+
+      - name: Build kernel
+        run: |
+          mv clang-r353983c ~/clang-r353983c
+          cp scripts/build9.sh kernel_source/
+          cd kernel_source
+          chmod 755 build9.sh
+          ./build9.sh
+        
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: 803SH-kernel-build-artifacts
+          path: |
+            kernel_source/out/arch/arm64/boot/*
+          retention-days: 30
