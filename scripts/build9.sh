@@ -25,5 +25,4 @@ make -j$(nproc --all) O=out \
     OBJDUMP=llvm-objdump \
     STRIP=llvm-strip \
     CROSS_COMPILE=aarch64-linux-gnu- \
-    CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
-    KCFLAGS="-Wno-array-bounds -Wformat -Wsometimes-uninitialized -Wformat-extra-args -Wformat-security -Wunknown-warning-option -Wunused-result -Wuninitialized -Wno-error -Wno-pointer-sign"
+    CROSS_COMPILE_ARM32=arm-linux-gnueabi-
