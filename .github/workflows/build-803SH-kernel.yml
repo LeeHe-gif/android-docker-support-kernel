@@ -23,7 +23,11 @@ jobs:
           key: clang-r383902
           restore-keys: |
             clang-r383902
-
+      
+      - name: git GCC
+        run : |
+          git clone https://github.com/KudProject/aarch64-linux-android-4.9.git --depth 1
+      
       - name: Install basic dependencies
         run: |
           sudo apt-get update
@@ -54,6 +58,7 @@ jobs:
       - name: Build kernel
         run: |
           mv clang-r383902 ~/clang-r383902
+          mv aarch64-linux-android-4.9 ~/aarch64-linux-android-4.9
           cp scripts/build9.sh kernel_source/
           cd kernel_source
           chmod 755 build9.sh
