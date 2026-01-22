@@ -58,6 +58,7 @@ jobs:
       - name: Build kernel
         run: |
           mv aarch64-linux-android-4.9 ~/aarch64-linux-android-4.9
+          ls ~/
           cp scripts/build9.sh kernel_source/
           cd kernel_source
           chmod 755 build9.sh
