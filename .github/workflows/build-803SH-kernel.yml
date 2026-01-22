@@ -25,7 +25,7 @@ jobs:
       
       - name: git GCC
         run : |
-          git clone https://github.com/Zenfone2-Dev/x86_64-linux-android-4.9.git --depth 1
+          git clone https://github.com/KudProject/aarch64-linux-android-4.9.git --depth 1
       
       - name: Install basic dependencies
         run: |
@@ -57,7 +57,7 @@ jobs:
       - name: Build kernel
         run: |
           mv clang-r353983c ~/clang-r353983c
-          mv x86_64-linux-android-4.9 ~/x86_64-linux-android-4.9
+          mv aarch64-linux-android-4.9 ~/aarch64-linux-android-4.9
           ls ~/
           cp scripts/build9.sh kernel_source/
           cd kernel_source
