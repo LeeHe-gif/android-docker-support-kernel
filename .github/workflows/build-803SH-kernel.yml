@@ -35,7 +35,7 @@ jobs:
             libncurses-dev bison bc flex libssl-dev \
             gcc-arm-linux-gnueabi xz-utils ccache rsync \
             libelf-dev rsync kmod git cpio wget zip \
-            unzip make 
+            unzip make binutils-aarch64-linux-gnu
             
       - name: Cache Python 2.7
         uses: actions/cache@v4
