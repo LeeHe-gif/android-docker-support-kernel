@@ -12,7 +12,7 @@ make O=out my_803sh_defconfig \
     OBJCOPY=objcopy \
     OBJDUMP=objdump \
     STRIP=strip \
-    CROSS_COMPILE=aaarch64-linux-android- \
+    CROSS_COMPILE=aarch64-linux-android- \
     CROSS_COMPILE_ARM32=arm-linux-gnueabi-
 
 
@@ -25,7 +25,7 @@ make -j$(nproc --all) O=out \
     OBJCOPY=objcopy \
     OBJDUMP=objdump \
     STRIP=strip \
-    CROSS_COMPILE=aaarch64-linux-android- \
+    CROSS_COMPILE=aarch64-linux-android- \
     CROSS_COMPILE_ARM32=arm-linux-gnueabi-
     KCFLAGS="-Wno-array-bounds -Wformat -Wsometimes-uninitialized -Wformat-extra-args -Wformat-security -Wunknown-warning-option -Wunused-result -Wuninitialized -Wno-error -Wno-pointer-sign"
 
