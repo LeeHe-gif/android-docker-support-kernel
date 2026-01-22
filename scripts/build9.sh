@@ -1,11 +1,15 @@
 #!/bin/bash
 
-export CLANG_PATH=/home/runner/aarch64-linux-android-4.9/aarch64-linux-android/bin/
-export GCC_PREBUILT_BIN=/home/runner/aarch64-linux-android-4.9/bin/aarch64-linux-android-
-export PATH=$CLANG_PATH:$GCC_PREBUILT_BIN:$PATH
+export CROSS_COMPILE=/home/runner/aarch64-linux-android-4.9/bin/aarch64-linux-android-
+export PATH=/home/runner/aarch64-linux-android-4.9/bin/:$CROSS_COMPILE:$PATH
+
+echo "当前工具链:"
+which aarch64-linux-android-gcc
+aarch64-linux-android-gcc --version
 
 make O=out my_803sh_defconfig \
     ARCH=arm64 \
+    CC=aarch64-linux-android-gcc \
     AR=ar \
     NM=nm \
     LD=ld \
@@ -19,6 +23,7 @@ make O=out my_803sh_defconfig \
 
 make -j$(nproc --all) O=out \
     ARCH=arm64 \
+    CC=aarch64-linux-android-gcc \
     AR=ar \
     NM=nm \
     LD=ld \
