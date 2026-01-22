@@ -16,13 +16,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Cache clang toolchain
-        uses: actions/cache@v3
-        with:
-          path: clang-r383902
-          key: clang-r383902
-          restore-keys: |
-            clang-r383902
+      #- name: Cache clang toolchain
+      # uses: actions/cache@v3
+      #  with:
+      #   path: clang-r383902
+      #   key: clang-r383902
+      #  restore-keys: |
+      #    clang-r383902
       
       - name: git GCC
         run : |
@@ -57,7 +57,6 @@ jobs:
 
       - name: Build kernel
         run: |
-          mv clang-r383902 ~/clang-r383902
           mv aarch64-linux-android-4.9 ~/aarch64-linux-android-4.9
           cp scripts/build9.sh kernel_source/
           cd kernel_source
