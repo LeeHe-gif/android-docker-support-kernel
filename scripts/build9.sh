@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export ARCH=arm64
-export CLANG_PREBUILT_BIN=/home/runner/clang-r353983c/bin
+# export CLANG_PREBUILT_BIN=/home/runner/clang-r353983c/bin
 export CROSS_COMPILE=/home/runner/aarch64-linux-android-4.9/bin/aarch64-linux-android-
 export PATH=/home/runner/aarch64-linux-android-4.9/bin:$PATH
 
@@ -10,9 +10,21 @@ which aarch64-linux-android-gcc
 aarch64-linux-android-gcc --version
 
 make O=out my_803sh_defconfig \
-
+    AR=aarch64-linux-gnu-ar \
+    NM=aarch64-linux-gnu-nm \
+    LD=aarch64-linux-gnu-ld \
+    OBJCOPY=aarch64-linux-gnu-objcopy \
+    OBJDUMP=aarch64-linux-gnu-objdump \
+    STRIP=aarch64-linux-gnu-strip
+    
 make -j$(nproc --all) O=out \
-
+    AR=aarch64-linux-gnu-ar \
+    NM=aarch64-linux-gnu-nm \
+    LD=aarch64-linux-gnu-ld \
+    OBJCOPY=aarch64-linux-gnu-objcopy \
+    OBJDUMP=aarch64-linux-gnu-objdump \
+    STRIP=aarch64-linux-gnu-strip
+    
 if [ -f "out/arch/arm64/boot/Image" ]; then
     echo "✅ 内核编译成功"
 else
