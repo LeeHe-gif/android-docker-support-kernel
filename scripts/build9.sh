@@ -28,3 +28,10 @@ make -j$(nproc --all) O=out \
     CROSS_COMPILE=aaarch64-linux-android- \
     CROSS_COMPILE_ARM32=arm-linux-gnueabi-
     KCFLAGS="-Wno-array-bounds -Wformat -Wsometimes-uninitialized -Wformat-extra-args -Wformat-security -Wunknown-warning-option -Wunused-result -Wuninitialized -Wno-error -Wno-pointer-sign"
+
+if [ -f "out/arch/arm64/boot/Image" ]; then
+    echo "✅ 内核编译成功"
+else
+    echo "❌ 内核编译失败 - Image 未生成"
+    exit 1
+f
