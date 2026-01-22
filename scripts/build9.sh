@@ -1,13 +1,5 @@
 #!/bin/bash
 
-cd kernel_source
-
-# 清理
-make clean && make mrproper
-rm -rf out
-mkdir -p out
-
-# 使用 Clang 可以避免很多工具链问题
 export ARCH=arm64
 
 # 主机工具使用系统 gcc
