@@ -22,11 +22,7 @@ jobs:
          path: clang-r353983c
          key: clang-r353983c
          restore-keys: clang-r353983c
-      
-      - name: git GCC
-        run : |
-          git clone https://github.com/KudProject/aarch64-linux-android-4.9.git --depth 1
-      
+
       - name: Install basic dependencies
         run: |
           sudo apt-get update
@@ -57,8 +53,6 @@ jobs:
       - name: Build kernel
         run: |
           mv clang-r353983c ~/clang-r353983c
-          mv aarch64-linux-android-4.9 ~/aarch64-linux-android-4.9
-          ls ~/
           cp scripts/build9.sh kernel_source/
           cd kernel_source
           chmod 755 build9.sh
