@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export CLANG_PATH=/home/runner/aarch64-linux-android/bin/
+export CLANG_PATH=/home/runner/aarch64-linux-android-4.9/aarch64-linux-android/bin/
 export GCC_PREBUILT_BIN=/home/runner/aarch64-linux-android-4.9/bin/aarch64-linux-android-
 export PATH=$CLANG_PATH:$GCC_PREBUILT_BIN:$PATH
 
