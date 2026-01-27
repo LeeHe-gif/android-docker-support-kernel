@@ -1,0 +1,80 @@
+name: Build polaris crDroid Kernel
+
+on:
+  workflow_dispatch:
+
+env:
+  TZ: Asia/Shanghai
+  REPO_URL: https://github.com/LeeHe-gif/android_kernel_xiaomi_sdm845_crdroid.git
+  REPO_BRANCH: "11.0"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Cache clang toolchain
+        uses: actions/cache@v3
+        with:
+          path: clang-r433403b
+          key: clang-r433403b
+          restore-keys: |
+            clang-r433403b
+
+      - name: Free disk space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: true
+          android: true
+          dotnet: true
+
+      - name: Setup massive swap
+        run: |
+          free -h
+          sudo fallocate -l 32G /swapfile
+          sudo chmod 600 /swapfile
+          sudo mkswap /swapfile
+          sudo swapon /swapfile
+          free -h
+          echo "Swap setup completed"
+    
+      - name: Show hardware info
+        run: |
+          chmod 755 ./scripts/show_hardware_info.sh
+          ./scripts/show_hardware_info.sh
+
+      - name: Install basic dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            curl build-essential \
+            libncurses-dev bison bc flex libssl-dev \
+            gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi \
+            libelf-dev rsync kmod git cpio wget zip \
+            unzip python3 python-is-python3 make u-boot-tools \
+            xz-utils python3-pip ccache rsync dos2unix
+
+      - name: Clone kernel source repository
+        run: |
+          git clone --depth 1 $REPO_URL -b $REPO_BRANCH kernel_source
+
+      - name: Build kernel with clang-r433403b
+        run: |
+          mv clang-r433403b ~/clang-r433403b
+          cp scripts/build10.sh kernel_source/
+          mkdir -p kernel_source/out
+          cd kernel_source/
+          chmod 755 build10.sh
+          ./build10.sh
+          cp out/.config config
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: polaris-kernel-build-artifacts-1
+          path: |
+            kernel_source/out/arch/arm64/boot/*
+            kernel_source/config
